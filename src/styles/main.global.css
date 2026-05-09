@@ -16,6 +16,7 @@ html {
 body {
   display: flex;
   flex-direction: row;
+  justify-content: center;
 
   background-color: var(--bg-color);
   color: var(--text-color);
@@ -23,13 +24,14 @@ body {
   margin: auto;
 
   height: 100dvh;
-  max-width: 2000px;
+  max-width: 1200px;
   width: 100%;
 
   font-family: var(--font-sf), sans-serif;
   letter-spacing: 0.2px;
   font-weight: 300;
 }
+
 
 a {
   text-decoration: none;

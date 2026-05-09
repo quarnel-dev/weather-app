@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { sfUIText } from './fonts'
 
 import '@/styles/main.global.css'
+import '@/styles/icons.global.css'
 
 export const metadata: Metadata = {
   title: 'Weather app',
