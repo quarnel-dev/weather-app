@@ -4,6 +4,11 @@
   padding: 0;
 }
 
+:root {
+    --bg-color: #0a0a0a;
+    --text-color: #fafafa;
+}
+
 html {
   font-size: 16px;
 }
@@ -11,7 +16,9 @@ html {
 body {
   display: flex;
   flex-direction: row;
-  align-items: center;
+
+  background-color: var(--bg-color);
+  color: var(--text-color);
 
   margin: auto;
 

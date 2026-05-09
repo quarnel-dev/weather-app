@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   compress: true,
   devIndicators: false,
+  allowedDevOrigins: process.env.ALLOWED_ORIGINS?.split(','),
 }
 
 export default nextConfig
-  
