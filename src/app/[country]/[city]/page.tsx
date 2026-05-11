@@ -1,7 +1,7 @@
 'use client'
 
-import { motion } from "motion/react"
+import Search from '@/components/search/Search'
 
 export default function Page() {
-  return <motion.div layoutId="citySearch">page 2</motion.div>
+  return <Search />
 }

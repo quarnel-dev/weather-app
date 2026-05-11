@@ -5,8 +5,15 @@
 }
 
 :root {
-    --bg-color: #0a0a0a;
-    --text-color: #fafafa;
+  --bg-color: #070b14;
+  --text-color: #fafafa;
+  --border-color: #262626;
+  --hover-border-color: #6f3aa08e;
+  --muted-color: #858585;
+  --card: #0b121da4;
+
+  --accent-purple: #a855f7;
+  --accent-purple-glow: rgba(168, 85, 247, 0.6);
 }
 
 html {
@@ -31,7 +38,6 @@ body {
   letter-spacing: 0.2px;
   font-weight: 300;
 }
-
 
 a {
   text-decoration: none;
