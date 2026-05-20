@@ -13,3 +13,4 @@ export async function getWeather(city: string) {
 export async function getForecast(city: string) {
   return ''
 }
+  
