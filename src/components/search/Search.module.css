@@ -124,3 +124,16 @@
   font-weight: 300;
   font-size: 14px;
 }
+
+.itemLink {
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+}

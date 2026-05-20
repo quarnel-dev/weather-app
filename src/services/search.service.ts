@@ -1,20 +1,10 @@
 import cities from '@/data/cities.json'
 import countries from '@/data/countries.json'
 
-export interface City {
-  id: number
-  name: string
-  country: string
-  admin1: string
-  lat: string
-  lon: string
-  pop: string
-}
+import { toSlug } from '@/utils/slug'
 
-interface Country {
-  name: string
-  code: string
-}
+import { City } from '@/types/City.type'
+import { Country } from '@/types/Country.type'
 
 export const countryMap = new Map<string, string>((countries as Country[]).map(({ code, name }) => [code, name]))
 
@@ -42,7 +32,9 @@ export function searchCities(query: string): City[] {
     }
   }
 
-  return [...byCity, ...byCountry]
-    .sort((a, b) => Number(b.pop) - Number(a.pop)) 
-    .slice(0, MAX_RESULTS)
+  return [...byCity, ...byCountry].sort((a, b) => Number(b.pop) - Number(a.pop)).slice(0, MAX_RESULTS)
+}
+
+export function findCity(country: string, city: string): City | undefined {
+  return (cities as City[]).find((c) => toSlug(c.country) === country && toSlug(c.name) === city)
 }
