@@ -1,40 +1,46 @@
-import cities from '@/data/cities.json'
 import countries from '@/data/countries.json'
 
-import { toSlug } from '@/utils/slug'
+import { cityBySlug, cityNameIndex, countryNameIndex } from './cities.index'
+
+import { normalize } from '@/utils/normalize'
 
 import { City } from '@/types/City.type'
 import { Country } from '@/types/Country.type'
 
 export const countryMap = new Map<string, string>((countries as Country[]).map(({ code, name }) => [code, name]))
 
-const MAX_RESULTS = 8
-const SCAN_LIMIT = MAX_RESULTS * 4
-
-function normalise(str: string) {
-  return str.toLowerCase().trim()
-}
-
 export function searchCities(query: string): City[] {
-  const q = normalise(query)
+  const q = normalize(query)
   if (q.length < 2) return []
 
-  const byCity: City[] = []
-  const byCountry: City[] = []
+  const result: City[] = []
+  const seen = new Set<string>()
 
-  for (const city of cities as City[]) {
-    if (byCity.length + byCountry.length >= SCAN_LIMIT) break
-
-    if (normalise(city.name).includes(q)) {
-      byCity.push(city)
-    } else if (normalise(countryMap.get(city.country) ?? '').includes(q)) {
-      byCountry.push(city)
+  for (const [key, cities] of cityNameIndex) {
+    if (key.includes(q)) {
+      for (const city of cities) {
+        const id = `${city.country}-${city.name}`
+        if (seen.has(id)) continue
+        seen.add(id)
+        result.push(city)
+      }
     }
   }
 
-  return [...byCity, ...byCountry].sort((a, b) => Number(b.pop) - Number(a.pop)).slice(0, MAX_RESULTS)
+  for (const [key, cities] of countryNameIndex) {
+    if (key.includes(q)) {
+      for (const city of cities) {
+        const id = `${city.country}-${city.name}`
+        if (seen.has(id)) continue
+        seen.add(id)
+        result.push(city)
+      }
+    }
+  }
+
+  return result.sort((a, b) => Number(b.pop) - Number(a.pop)).slice(0, 8)
 }
 
 export function findCity(country: string, city: string): City | undefined {
-  return (cities as City[]).find((c) => toSlug(c.country) === country && toSlug(c.name) === city)
+  return cityBySlug.get(`${country}-${city}`)
 }

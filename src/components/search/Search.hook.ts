@@ -39,9 +39,8 @@ export function useSearch() {
       },
 
       Enter: () => {
-        if (activeIndex >= 0) {
-          router.push(cityUrl(results[activeIndex]))
-        }
+        const index = activeIndex >= 0 ? activeIndex : 0
+        if (results[index]) router.push(cityUrl(results[index]))
       },
     }
     actions[e.key]?.()
