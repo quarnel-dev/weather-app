@@ -7,8 +7,8 @@ import { motion, AnimatePresence } from 'motion/react'
 
 import s from './page.module.css'
 
-import { getGeoClient } from '@/services/getGeo.service'
-import { reverseGeo } from '@/services/reverseGeo.action'
+import { getGeoClient } from '@/services/geo/getGeo.service'
+import { reverseGeo } from '@/services/geo/reverseGeo.action'
 
 import Search from '@/components/search/Search'
 
