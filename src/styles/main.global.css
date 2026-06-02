@@ -34,6 +34,8 @@ body {
   max-width: 1200px;
   width: 100%;
 
+  padding: 40px;
+
   font-family: var(--font-sf), sans-serif;
   letter-spacing: 0.2px;
   font-weight: 300;
