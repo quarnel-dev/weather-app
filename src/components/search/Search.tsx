@@ -6,25 +6,19 @@ import Link from 'next/link'
 
 import { useSearch } from './Search.hook'
 
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence } from 'motion/react'
 import { dropdownVariants, itemVariants } from './Search.variants'
 
-import { countryMap } from '@/services/search.service'
-
-import { cityUrl } from '@/utils/cityUrl'
+import { MAX_SEARCH_LENGTH } from '@/services/search.constants'
 
 export default function Search() {
-  const { query, results, activeIndex, isFocused, open, inputRef, listId, handleChange, handleFocus, handleKeyDown, handleBlur } =
+  const { query, results, status, message, activeIndex, isFocused, open, inputRef, listId, handleChange, handleFocus, handleKeyDown, handleBlur } =
     useSearch()
 
   return (
+    <>
     <div
       className={s.containerSearch}
-      role="combobox"
-      aria-expanded={open}
-      aria-haspopup="listbox"
-      aria-controls={listId}
-      aria-owns={listId}
     >
       <motion.i
         className={`i-search ${s.iconSearch}`}
@@ -39,9 +33,16 @@ export default function Search() {
         ref={inputRef}
         className={s.inputSearch}
         type="text"
+        role="combobox"
+        maxLength={MAX_SEARCH_LENGTH}
+        autoComplete="off"
         placeholder="Search for cities..."
         aria-label="Search cities"
         aria-autocomplete="list"
+        aria-expanded={open}
+        aria-haspopup="listbox"
+        aria-busy={status === 'loading'}
+        aria-describedby={message ? `${listId}-status` : undefined}
         aria-controls={open ? listId : undefined}
         aria-activedescendant={activeIndex >= 0 ? `${listId}-${activeIndex}` : undefined}
         value={query}
@@ -64,7 +65,6 @@ export default function Search() {
             onMouseDown={(e) => e.preventDefault()}
           >
             {results.map((city, i) => {
-              const countryName = countryMap.get(city.country) ?? city.country
               return (
                 <motion.li
                   key={city.id}
@@ -76,7 +76,7 @@ export default function Search() {
                   whileHover={{ x: 3 }}
                   transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                 >
-                  <Link href={cityUrl(city)} className={s.itemLink}>
+                  <Link href={city.url} className={s.itemLink} onClick={handleBlur} prefetch={false}>
                     <span>
                       <span className={s.cityName}>{city.name}</span>
                       {city.admin1 && <span className={s.admin1}> · {city.admin1}</span>}
@@ -87,7 +87,7 @@ export default function Search() {
                       animate={{ opacity: 1 }}
                       transition={{ delay: i * 0.04 + 0.1 }}
                     >
-                      {countryName}
+                      {city.countryName}
                     </motion.span>
                   </Link>
                 </motion.li>
@@ -97,5 +97,7 @@ export default function Search() {
         )}
       </AnimatePresence>
     </div>
+    {message && <p id={`${listId}-status`} role={status === 'error' ? 'alert' : 'status'}>{message}</p>}
+    </>
   )
 }
