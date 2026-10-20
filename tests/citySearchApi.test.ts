@@ -62,6 +62,15 @@ describe('city search API', () => {
     expect(results.every((city) => typeof city.admin1 === 'string')).toBe(true)
   })
 
+
+  test.each([['xk', 'XK'], ['Kosovo', 'XK'], ['Serbia', 'RS']])('finds countries absent from the legacy name map: %s', async (query, country) => {
+    const response = await request(`?q=${encodeURIComponent(query)}`)
+    const { results }: { results: CitySearchResult[] } = await response.json()
+    expect(results).toHaveLength(8)
+    expect(results.some((city) => city.country === country)).toBe(true)
+    expect(results.filter((city) => city.country === country).every((city) => city.countryName !== city.country)).toBe(true)
+  })
+
   test.each([`?q=${'x'.repeat(81)}`, '?q=London&q=Moscow'])('rejects invalid query: %s', async (query) => {
     const response = await request(query)
     expect(response.status).toBe(400)

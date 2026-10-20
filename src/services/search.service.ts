@@ -13,6 +13,11 @@ import { Country } from '@/types/Country.type'
 
 export const countryMap = new Map<string, string>((countries as Country[]).map(({ code, name }) => [code, name]))
 
+const regionNames = new Intl.DisplayNames(['en'], { type: 'region' })
+for (const { country } of cityById.values()) {
+  if (!countryMap.has(country)) countryMap.set(country, regionNames.of(country) ?? country)
+}
+
 const searchIndex = [...cityById.values()]
   .sort((a, b) => Number(b.pop) - Number(a.pop) || a.id - b.id)
   .map((city) => ({ city, name: normalize(city.name) }))
