@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
 import { GET } from '@/app/api/cities/route'
-import { findCities } from '@/services/search.service'
+import { findCities, searchCities } from '@/services/search.service'
 import type { CitySearchResult } from '@/types/CitySearchResult.type'
 
 async function request(query = '') {
@@ -44,6 +44,15 @@ describe('city search API', () => {
   test('returns no results for an unknown city', async () => {
     const response = await request('?q=zzzzzzzzzzzzzzzzz')
     expect(await response.json()).toEqual({ results: [] })
+  })
+
+  test('supports country names and orders results by population', async () => {
+    const response = await request('?q=United%20States')
+    const { results }: { results: CitySearchResult[] } = await response.json()
+    expect(results).toHaveLength(8)
+    expect(results.every((city) => city.country === 'US')).toBe(true)
+    const populations = searchCities('United States').map((city) => Number(city.pop))
+    expect(populations).toEqual([...populations].sort((a, b) => b - a))
   })
 
   test.each([`?q=${'x'.repeat(81)}`, '?q=London&q=Moscow'])('rejects invalid query: %s', async (query) => {
