@@ -1,9 +1,9 @@
-const assert = require('node:assert/strict')
-const { test } = require('node:test')
-const cities = require('../src/data/cities.json')
-const { findCities, searchCities } = require('../src/services/search.service.ts')
-const { cityUrl } = require('../src/utils/cityUrl.ts')
-const { getWeather, getForecast } = require('../src/services/weather.service.ts')
+import assert from 'node:assert/strict'
+import { test, vi } from 'vitest'
+import cities from '@/data/cities.json'
+import { findCities, searchCities } from '@/services/search.service'
+import { cityUrl } from '@/utils/cityUrl'
+import { getWeather, getForecast } from '@/services/weather.service'
 
 test('unique city keeps its short URL', () => {
   const [moscow] = findCities('ru', 'moscow')
@@ -52,9 +52,9 @@ test('every database record has a unique URL that resolves to that exact ID', ()
   }
 })
 
-test('weather and forecast use the exact selected coordinates, never the city name', async (t) => {
-  const requests = []
-  t.mock.method(globalThis, 'fetch', async (url) => {
+test('weather and forecast use the exact selected coordinates, never the city name', async () => {
+  const requests: URL[] = []
+  vi.stubGlobal('fetch', vi.fn(async (url: string) => {
     requests.push(new URL(url))
     if (new URL(url).pathname.endsWith('/forecast')) {
       return { ok: true, json: async () => ({ list: [] }) }
@@ -68,7 +68,7 @@ test('weather and forecast use the exact selected coordinates, never the city na
         wind: { speed: 2, deg: 90 }, clouds: { all: 0 }, coord: { lat: 1, lon: 2 },
       }),
     }
-  })
+  }))
   for (const city of findCities('cn', 'suzhou')) {
     await getWeather(city)
     await getForecast(city)

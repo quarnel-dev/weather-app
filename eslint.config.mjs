@@ -12,12 +12,6 @@ const eslintConfig = defineConfig([
     'next-env.d.ts',
   ]),
   {
-    files: ['tests/*.cjs'],
-    rules: {
-      '@typescript-eslint/no-require-imports': 'off',
-    },
-  },
-  {
     rules: {
       'no-multiple-empty-lines': 'off',
       'no-trailing-spaces': 'off',
