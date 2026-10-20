@@ -19,7 +19,7 @@ Queries shorter than two normalized characters return an empty list. More than 8
 
 ## Validation
 
-- `npm test`: 41 tests pass using Vitest 4. Test projects separate Node tests (`--project server`) from React/jsdom tests (`--project react`). The previous seven city checks are retained.
+- `npm test`: 55 tests pass using Vitest 4 after the [follow-up audit](searchAudit.md). Test projects separate Node tests (`--project server`) from React/jsdom tests (`--project react`). The previous seven city checks are retained.
 - Tests cover API validation, compact results, population order, same-name locations, nullable regions, response validation, debounce, cancellation, stale responses, keyboard navigation, refocus/retry, unmount, and rendered status messages.
 - `npm run lint` and `npm run build` passed; build includes TypeScript. Next.js still reports the existing middleware naming deprecation.
 - Production HTTP checks passed for empty, short, unknown, ambiguous, country-name, null-region, overlong, and repeated-parameter queries. Suzhou returned two distinct links in a 239-byte response.
@@ -27,7 +27,9 @@ Queries shorter than two normalized characters return an empty list. More than 8
 - The production build contains 898,564 bytes of client JavaScript across 14 files (275,936 bytes summed after individual gzip compression). Its largest file is 227,535 bytes; the previous build had database-bearing files of 26,505,194 bytes. These are artifact measurements, not browser transfer measurements.
 - No database marker strings (Shenzhen, Kinshasa, Guangzhou) were present in the generated client JavaScript. The successful build also validates the server-only import boundaries.
 - The homepage, ambiguous city page, invalid-city 404, and live Moscow weather passed production HTTP checks.
-- React/jsdom component tests validate markup and interactions. No visual browser review was performed.
+- React/jsdom component tests validate markup and interactions. The follow-up audit added twelve real Chromium scenarios and inspected a mobile screenshot; the lead's design review remains outstanding.
+
+The timing and bundle-size figures above describe the initial implementation. Updated build measurements, fixed defects, timeout/IME handling, and dependency-audit results are recorded in [`searchAudit.md`](searchAudit.md).
 
 ## Remaining work
 
