@@ -1,7 +1,8 @@
 import { describe, expect, test } from 'vitest'
 import { GET } from '@/app/api/cities/route'
-import { findCities, searchCities } from '@/services/search.service'
+import { countryMap, findCities, searchCities } from '@/services/search.service'
 import type { CitySearchResult } from '@/types/CitySearchResult.type'
+import cities from '@/data/cities.json'
 
 async function request(query = '') {
   return GET(new Request(`http://localhost/api/cities${query}`))
@@ -69,6 +70,20 @@ describe('city search API', () => {
     expect(results).toHaveLength(8)
     expect(results.some((city) => city.country === country)).toBe(true)
     expect(results.filter((city) => city.country === country).every((city) => city.countryName !== city.country)).toBe(true)
+  })
+
+  test('matches an independent full-scan ranking across representative queries', () => {
+    const samples = cities.filter((_, index) => index % 7000 === 0).map((city) => city.name.slice(0, 3))
+    const queries = ['mos', 'xk', 'rs', 'me', 'São', 'United States', 'china', 'zzzzzzzzzz', ...samples]
+    for (const query of queries) {
+      const normalized = query.toLowerCase().trim()
+      const expected = cities.filter((city) =>
+        city.name.toLowerCase().includes(normalized) ||
+        city.country.toLowerCase().includes(normalized) ||
+        countryMap.get(city.country)?.toLowerCase().includes(normalized),
+      ).sort((a, b) => Number(b.pop) - Number(a.pop) || a.id - b.id).slice(0, 8)
+      expect(searchCities(query).map((city) => city.id), query).toEqual(expected.map((city) => city.id))
+    }
   })
 
   test.each([`?q=${'x'.repeat(81)}`, '?q=London&q=Moscow'])('rejects invalid query: %s', async (query) => {
