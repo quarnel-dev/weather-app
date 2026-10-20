@@ -198,3 +198,32 @@ describe('asynchronous city search', () => {
     expect(result.current.message).toBe('Use up to 80 characters.')
   })
 })
+
+
+test.each(['Enter', 'Escape', 'ArrowDown', 'ArrowUp'])('does not intercept %s during IME composition', async (pressed) => {
+  const { result } = renderHook(useSearch)
+  act(() => {
+    result.current.handleFocus()
+    result.current.handleChange(change('city'))
+  })
+  await waitForSearch()
+  const event = { ...key(pressed), nativeEvent: { isComposing: true } } as unknown as KeyboardEvent
+  act(() => result.current.handleKeyDown(event))
+  expect(push).not.toHaveBeenCalled()
+  expect(event.preventDefault).not.toHaveBeenCalled()
+  expect(result.current.open).toBe(true)
+})
+
+test('preserves IME input when the browser reports legacy key code 229', async () => {
+  const { result } = renderHook(useSearch)
+  act(() => {
+    result.current.handleFocus()
+    result.current.handleChange(change('city'))
+  })
+  await waitForSearch()
+  const event = { ...key('Enter'), nativeEvent: { isComposing: false, keyCode: 229 } } as unknown as KeyboardEvent
+  act(() => result.current.handleKeyDown(event))
+  expect(push).not.toHaveBeenCalled()
+  expect(result.current.open).toBe(true)
+})
+
