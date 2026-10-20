@@ -1,3 +1,5 @@
+import 'server-only'
+
 import cities from '../data/cities.json'
 import { toSlug } from '../utils/slug'
 import type { City } from '../types/City.type'

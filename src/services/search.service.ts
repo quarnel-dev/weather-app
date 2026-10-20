@@ -1,3 +1,5 @@
+import 'server-only'
+
 import countries from '../data/countries.json'
 
 import { cityById, citiesBySlug } from './cities.index'

@@ -1,3 +1,5 @@
+import 'server-only'
+
 import type { City } from '@/types/City.type'
 import { toSlug } from './slug'
 import { citiesBySlug } from '../services/cities.index'

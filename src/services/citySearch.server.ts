@@ -1,3 +1,5 @@
+import 'server-only'
+
 import type { CitySearchResult } from '@/types/CitySearchResult.type'
 import { cityUrl } from '@/utils/cityUrl'
 import { countryMap, searchCities } from './search.service'
