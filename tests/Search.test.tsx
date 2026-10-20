@@ -78,3 +78,14 @@ test('releases native input focus after keyboard selection so another search can
   await act(async () => { await vi.advanceTimersByTimeAsync(250) })
   expect(input.getAttribute('aria-expanded')).toBe('true')
 })
+
+test('makes outgoing suggestions inert and hides them from accessibility navigation', async () => {
+  vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => ({ results }) }))
+  render(<Search />)
+  const input = await search()
+  await act(async () => { await vi.advanceTimersByTimeAsync(250) })
+  expect(screen.getByRole('listbox')).toBeTruthy()
+  fireEvent.change(input, { target: { value: 'Moscow' } })
+  expect(screen.queryByRole('listbox')).toBeNull()
+  expect(screen.getByRole('listbox', { hidden: true }).hasAttribute('inert')).toBe(true)
+})
