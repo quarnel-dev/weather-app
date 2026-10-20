@@ -5,7 +5,7 @@ Agent working documents live in this directory; repository instructions are in [
 The user acts as lead developer and reviews scope and design. Do not commit or push without their instruction.
 
 1. **City identity and routes — completed and accepted by the lead.** Keep `/country/city` for unique slugs within a country. When slugs collide, use `/country/city-ID`; the short address shows a choice of locations, never silently selects one. Match collisions after slug normalization. Request weather and forecast using the selected record's coordinates. Reuse existing components and styles.
-2. **Server-side search — in progress.** Remove the city database from the browser bundle, debounce searches and ignore stale responses. Keep JSON on the server; add Vitest and preserve the current design, using plain text for new states.
+2. **Server-side search — implemented, awaiting lead review.** Remove the city database from the browser bundle, debounce searches and ignore stale responses. Keep JSON on the server; add Vitest and preserve the current design, using plain text for new states. Decisions and checks: [`serverSearch.md`](serverSearch.md).
 3. **Geolocation and remembered city.** Resolve coordinates to a database record, use canonical URLs, validate cookies and provide search fallback.
 4. **Weather service reliability.** Validate API payloads, distinguish failures, add timeouts and remove the unused forecast log/request.
 5. **Page error handling.** Keep search available during API failures and provide retry behavior.
