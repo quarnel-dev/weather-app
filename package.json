@@ -6,7 +6,8 @@
     "dev": "next dev -H 0.0.0.0",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "node --require ./tests/register-typescript.cjs --test --test-isolation=none tests/*.test.cjs"
   },
   "dependencies": {
     "motion": "^12.38.0",

@@ -77,7 +77,10 @@ export default function Search() {
                   transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                 >
                   <Link href={cityUrl(city)} className={s.itemLink}>
-                    <span className={s.cityName}>{city.name}</span>
+                    <span>
+                      <span className={s.cityName}>{city.name}</span>
+                      {city.admin1 && <span className={s.admin1}> · {city.admin1}</span>}
+                    </span>
                     <motion.span
                       className={s.countryName}
                       initial={{ opacity: 0 }}

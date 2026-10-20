@@ -3,11 +3,13 @@
 import type { Weather } from '@/types/Weather.type'
 import type { Forecast } from '@/types/Forecast.type'
 import type { WeatherIcon } from '@/types/WeatherIcon.type'
+import type { City } from '@/types/City.type'
 
 const key = process.env.WEATHER_API_KEY
 
-export async function getWeather(city: string): Promise<Weather> {
-  const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${key}&units=metric&lang=en`, {
+export async function getWeather(city: Pick<City, 'lat' | 'lon'>): Promise<Weather> {
+  const params = new URLSearchParams({ lat: city.lat, lon: city.lon, appid: key ?? '', units: 'metric', lang: 'en' })
+  const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?${params}`, {
     next: { revalidate: 600 },
   })
 
@@ -49,8 +51,9 @@ export async function getWeather(city: string): Promise<Weather> {
   return result
 }
 
-export async function getForecast(city: string) {
-  const res = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${key}&units=metric&lang=en`, {
+export async function getForecast(city: Pick<City, 'lat' | 'lon'>) {
+  const params = new URLSearchParams({ lat: city.lat, lon: city.lon, appid: key ?? '', units: 'metric', lang: 'en' })
+  const res = await fetch(`https://api.openweathermap.org/data/2.5/forecast?${params}`, {
     next: { revalidate: 600 },
   })
 
