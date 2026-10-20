@@ -1,3 +1,5 @@
 export const MIN_SEARCH_LENGTH = 2
 export const MAX_SEARCH_LENGTH = 80
 export const SEARCH_RESULT_LIMIT = 8
+export const SEARCH_DEBOUNCE_MS = 250
+export const SEARCH_REQUEST_TIMEOUT_MS = 10000

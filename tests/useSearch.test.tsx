@@ -227,3 +227,52 @@ test('preserves IME input when the browser reports legacy key code 229', async (
   expect(result.current.open).toBe(true)
 })
 
+
+test('reports a stalled search after ten seconds and ignores its late result', async () => {
+  let resolve!: (value: ReturnType<typeof response>) => void
+  fetchMock.mockReturnValueOnce(new Promise((complete) => { resolve = complete }))
+  const { result } = renderHook(useSearch)
+  act(() => {
+    result.current.handleFocus()
+    result.current.handleChange(change('Moscow'))
+  })
+  await waitForSearch()
+  await act(async () => { await vi.advanceTimersByTimeAsync(10000) })
+  expect(result.current.status).toBe('error')
+  expect((fetchMock.mock.calls[0][1].signal as AbortSignal).aborted).toBe(true)
+  await act(async () => { resolve(response([moscow])) })
+  expect(result.current.status).toBe('error')
+  expect(result.current.results).toEqual([])
+})
+
+test('does not let an aborted request timeout replace a newer successful search', async () => {
+  fetchMock.mockReturnValueOnce(new Promise(() => {}))
+  const { result } = renderHook(useSearch)
+  act(() => {
+    result.current.handleFocus()
+    result.current.handleChange(change('Suzhou'))
+  })
+  await waitForSearch()
+  act(() => result.current.handleChange(change('Moscow')))
+  fetchMock.mockResolvedValueOnce(response([moscow]))
+  await waitForSearch()
+  await act(async () => { await vi.advanceTimersByTimeAsync(10000) })
+  expect(result.current.status).toBe('success')
+  expect(result.current.results).toEqual([moscow])
+})
+
+test('ignores a response body that completes after the query changes', async () => {
+  let resolveBody!: (value: { results: CitySearchResult[] }) => void
+  fetchMock.mockResolvedValueOnce({ ok: true, json: () => new Promise((resolve) => { resolveBody = resolve }) })
+  const { result } = renderHook(useSearch)
+  act(() => {
+    result.current.handleFocus()
+    result.current.handleChange(change('Suzhou'))
+  })
+  await waitForSearch()
+  act(() => result.current.handleChange(change('Moscow')))
+  fetchMock.mockResolvedValueOnce(response([moscow]))
+  await waitForSearch()
+  await act(async () => { resolveBody({ results: [suzhou] }) })
+  expect(result.current.results).toEqual([moscow])
+})

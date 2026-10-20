@@ -4,7 +4,7 @@ import { useEffect, useId, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 import { fetchCityResults } from '@/services/citySearch.client'
-import { MAX_SEARCH_LENGTH, MIN_SEARCH_LENGTH } from '@/services/search.constants'
+import { MAX_SEARCH_LENGTH, MIN_SEARCH_LENGTH, SEARCH_DEBOUNCE_MS, SEARCH_REQUEST_TIMEOUT_MS } from '@/services/search.constants'
 import type { CitySearchResult } from '@/types/CitySearchResult.type'
 import { normalize } from '@/utils/normalize'
 
@@ -28,7 +28,14 @@ export function useSearch() {
 
     const controller = new AbortController()
     requestRef.current = controller
+    let requestTimeout: ReturnType<typeof setTimeout> | undefined
     const timer = setTimeout(async () => {
+      requestTimeout = setTimeout(() => {
+        if (controller.signal.aborted) return
+        controller.abort()
+        setStatus('error')
+      }, SEARCH_REQUEST_TIMEOUT_MS)
+
       try {
         const matches = await fetchCityResults(value, controller.signal)
         if (controller.signal.aborted) return
@@ -37,11 +44,14 @@ export function useSearch() {
         setStatus('success')
       } catch {
         if (!controller.signal.aborted) setStatus('error')
+      } finally {
+        clearTimeout(requestTimeout)
       }
-    }, 250)
+    }, SEARCH_DEBOUNCE_MS)
 
     return () => {
       clearTimeout(timer)
+      clearTimeout(requestTimeout)
       controller.abort()
     }
   }, [query, isFocused])
