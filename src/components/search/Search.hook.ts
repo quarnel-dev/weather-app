@@ -73,11 +73,15 @@ export function useSearch() {
     setIsFocused(true)
   }
 
+  function handleSelect() {
+    handleBlur()
+    inputRef.current?.blur()
+  }
+
   function handleKeyDown(e: React.KeyboardEvent) {
     if (e.key === 'Escape') {
       e.preventDefault()
-      handleBlur()
-      inputRef.current?.blur()
+      handleSelect()
       return
     }
     if (!open) return
@@ -89,7 +93,7 @@ export function useSearch() {
         const selected = results[activeIndex >= 0 ? activeIndex : 0]
         if (selected) {
           router.push(selected.url)
-          handleBlur()
+          handleSelect()
         }
       },
     }
@@ -119,5 +123,6 @@ export function useSearch() {
     handleFocus,
     handleKeyDown,
     handleBlur,
+    handleSelect,
   }
 }

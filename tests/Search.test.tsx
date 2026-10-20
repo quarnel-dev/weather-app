@@ -62,3 +62,19 @@ test('renders a plain empty message when no cities match', async () => {
   await act(async () => { await vi.advanceTimersByTimeAsync(250) })
   expect(screen.getByRole('status').textContent).toBe('No cities found.')
 })
+
+
+test('releases native input focus after keyboard selection so another search can start', async () => {
+  vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => ({ results }) }))
+  render(<Search />)
+  const input = screen.getByRole('combobox') as HTMLInputElement
+  act(() => input.focus())
+  fireEvent.change(input, { target: { value: 'Suzhou' } })
+  await act(async () => { await vi.advanceTimersByTimeAsync(250) })
+  fireEvent.keyDown(input, { key: 'Enter' })
+  expect(document.activeElement).not.toBe(input)
+  act(() => input.focus())
+  fireEvent.change(input, { target: { value: 'Moscow' } })
+  await act(async () => { await vi.advanceTimersByTimeAsync(250) })
+  expect(input.getAttribute('aria-expanded')).toBe('true')
+})

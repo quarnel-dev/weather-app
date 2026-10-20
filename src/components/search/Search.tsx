@@ -12,7 +12,7 @@ import { dropdownVariants, itemVariants } from './Search.variants'
 import { MAX_SEARCH_LENGTH } from '@/services/search.constants'
 
 export default function Search() {
-  const { query, results, status, message, activeIndex, isFocused, open, inputRef, listId, handleChange, handleFocus, handleKeyDown, handleBlur } =
+  const { query, results, status, message, activeIndex, isFocused, open, inputRef, listId, handleChange, handleFocus, handleKeyDown, handleBlur, handleSelect } =
     useSearch()
 
   return (
@@ -76,7 +76,7 @@ export default function Search() {
                   whileHover={{ x: 3 }}
                   transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                 >
-                  <Link href={city.url} className={s.itemLink} onClick={handleBlur} prefetch={false}>
+                  <Link href={city.url} className={s.itemLink} onClick={handleSelect} prefetch={false}>
                     <span>
                       <span className={s.cityName}>{city.name}</span>
                       {city.admin1 && <span className={s.admin1}> · {city.admin1}</span>}
