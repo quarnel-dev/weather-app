@@ -55,6 +55,13 @@ describe('city search API', () => {
     expect(populations).toEqual([...populations].sort((a, b) => b - a))
   })
 
+  test('normalizes missing regions to an empty string', async () => {
+    const response = await request('?q=Hong%20Kong')
+    const { results }: { results: CitySearchResult[] } = await response.json()
+    expect(results.find((city) => city.id === 1819729)?.admin1).toBe('')
+    expect(results.every((city) => typeof city.admin1 === 'string')).toBe(true)
+  })
+
   test.each([`?q=${'x'.repeat(81)}`, '?q=London&q=Moscow'])('rejects invalid query: %s', async (query) => {
     const response = await request(query)
     expect(response.status).toBe(400)
