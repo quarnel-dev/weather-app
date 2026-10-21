@@ -2,6 +2,8 @@ import { describe, expect, test } from 'vitest'
 import { GET } from '@/app/api/cities/route'
 import { countryMap, findCities, searchCities } from '@/services/search.service'
 import type { CitySearchResult } from '@/types/CitySearchResult.type'
+import type { City } from '@/types/City.type'
+
 import cities from '@/data/cities.json'
 
 async function request(query = '') {
@@ -63,8 +65,11 @@ describe('city search API', () => {
     expect(results.every((city) => typeof city.admin1 === 'string')).toBe(true)
   })
 
-
-  test.each([['xk', 'XK'], ['Kosovo', 'XK'], ['Serbia', 'RS']])('finds countries absent from the legacy name map: %s', async (query, country) => {
+  test.each([
+    ['xk', 'XK'],
+    ['Kosovo', 'XK'],
+    ['Serbia', 'RS'],
+  ])('finds countries absent from the legacy name map: %s', async (query, country) => {
     const response = await request(`?q=${encodeURIComponent(query)}`)
     const { results }: { results: CitySearchResult[] } = await response.json()
     expect(results).toHaveLength(8)
@@ -73,16 +78,25 @@ describe('city search API', () => {
   })
 
   test('matches an independent full-scan ranking across representative queries', () => {
-    const samples = cities.filter((_, index) => index % 7000 === 0).map((city) => city.name.slice(0, 3))
+    const allCities = cities as City[]
+
+    const samples = allCities.filter((_, index) => index % 7000 === 0).map((city) => city.name.slice(0, 3))
     const queries = ['mos', 'xk', 'rs', 'me', 'São', 'United States', 'china', 'zzzzzzzzzz', ...samples]
     for (const query of queries) {
       const normalized = query.toLowerCase().trim()
-      const expected = cities.filter((city) =>
-        city.name.toLowerCase().includes(normalized) ||
-        city.country.toLowerCase().includes(normalized) ||
-        countryMap.get(city.country)?.toLowerCase().includes(normalized),
-      ).sort((a, b) => Number(b.pop) - Number(a.pop) || a.id - b.id).slice(0, 8)
-      expect(searchCities(query).map((city) => city.id), query).toEqual(expected.map((city) => city.id))
+      const expected = allCities
+        .filter(
+          (city) =>
+            city.name.toLowerCase().includes(normalized) ||
+            city.country.toLowerCase().includes(normalized) ||
+            countryMap.get(city.country)?.toLowerCase().includes(normalized)
+        )
+        .sort((a, b) => Number(b.pop) - Number(a.pop) || a.id - b.id)
+        .slice(0, 8)
+      expect(
+        searchCities(query).map((city) => city.id),
+        query
+      ).toEqual(expected.map((city) => city.id))
     }
   })
 
