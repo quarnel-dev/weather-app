@@ -5,3 +5,6 @@ next-env.d.ts
 *.tsbuildinfo
 package-lock.json
 src/data/
+.next-e2e/
+playwright-report/
+test-results/

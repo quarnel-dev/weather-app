@@ -1,0 +1,31 @@
+import { test, expect } from './support/fixtures'
+
+test('keeps search state while retrying a failed weather request', async ({ page, provider }) => {
+  await provider.mode('http-503')
+  await page.goto('/ru/moscow')
+  await expect(page.getByRole('main').getByRole('alert')).toHaveText('Weather is temporarily unavailable. Try again.')
+  const input = page.getByRole('combobox', { name: 'Search cities' })
+  await input.fill('Suzhou')
+  await expect(page.getByRole('option')).toHaveCount(2)
+  await input.press('Tab')
+  await expect(page.getByRole('button', { name: 'Try again' })).toBeFocused()
+  await provider.mode('valid', 750)
+  await page.getByRole('button', { name: 'Try again' }).click()
+  await expect(page.getByRole('button', { name: 'Retrying...' })).toBeDisabled()
+  await expect(input).toHaveValue('Suzhou')
+  await expect(page.getByText('20°C', { exact: true })).toBeVisible()
+  await expect(page.getByRole('main').getByRole('alert')).toHaveCount(0)
+  await expect(input).toHaveValue('Suzhou')
+})
+
+test('can search for a city from a real 404 response', async ({ page }) => {
+  const response = await page.goto('/zz/unknown-city')
+  expect(response?.status()).toBe(404)
+  await expect(page.getByRole('heading', { name: 'City not found' })).toBeVisible()
+  const input = page.getByRole('combobox', { name: 'Search cities' })
+  await input.fill('Moscow')
+  await expect(page.getByRole('listbox')).toBeVisible()
+  await input.press('Enter')
+  await expect(page).toHaveURL('/ru/moscow')
+  await expect(page.getByText('20°C', { exact: true })).toBeVisible()
+})

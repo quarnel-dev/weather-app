@@ -43,3 +43,6 @@ next-env.d.ts
 .vs/
 .vscode/
 package-lock.json
+/.next-e2e/
+/playwright-report/
+/test-results/

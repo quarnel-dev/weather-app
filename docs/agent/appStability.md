@@ -1,0 +1,32 @@
+# App stability working notes
+
+Work stays on `feat/app-stability` and Draft PR #6. The lead explicitly authorized implementation after the scope-only preparation commit. README changes are reserved for later work with the lead. New states use text and existing styles.
+
+## Development checkpoints
+
+- `8642cef`: known weather service failures map to safe messages and an explicit retry policy. Refreshing weather preserves the surrounding page and search component. Configuration/invalid-location failures offer search rather than an ineffective retry.
+- `1b46a3e`: unexpected weather errors have a local client boundary. New server children reset that boundary after refresh. The route-level fallback and 404 page also provide search and recovery navigation.
+- Browser regression work exposed a Tab-navigation defect: popup links could receive focus just as blur made the popup inert, leaving focus on the document body. Popup links now leave sequential tab navigation to the combobox and page controls, while arrows/Enter and mouse selection remain available.
+
+Each checked increment is committed and pushed before beginning the next one. Later discoveries receive follow-up fixes rather than rewriting completed work.
+
+## Persistent browser tests
+
+Playwright 1.64.1 runs against an isolated production build in `.next-e2e/`, using `tsconfig.e2e.json`. Normal development and production still use `.next/` and `tsconfig.json`. The test build disables the in-process data-cache memory layer so each test can reset its isolated filesystem cache reliably.
+
+The provider adapter is loaded only by Playwright's private server command. It requires `E2E_TEST_MODE=1`, installs a synthetic credential in that process, intercepts OpenWeather calls before network access, and exposes its control interface only on loopback port 3101. It is not imported by application code and adds no application route or production endpoint. The app test server uses port 3100 and refuses to reuse an existing server.
+
+The provider supports controlled successes, HTTP failures, invalid data, network failures, stalled headers/body, and a deliberate unexpected failure. Tests observe only endpoint paths, coordinates, modes, and abort state. No real provider credential is needed. Tests are serialized so control state and cache reset do not race across workers; each test gets a fresh browser context.
+
+Commands:
+
+```sh
+npm ci
+npx playwright install chromium
+npm run build:e2e
+npm run test:e2e
+```
+
+On a fresh Linux CI runner, install browser system dependencies with `npx playwright install --with-deps chromium`. A local preinstalled Chromium can be selected with `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` if needed. HTML reports and failed-test traces/screenshots go into ignored `playwright-report/` and `test-results/` directories.
+
+Initial production smoke coverage passes on both desktop and mobile Chromium: HTTP 503 to a successful manual retry with preserved search text, keyboard Tab access to retry, and search navigation from a real 404 response. Broader scenario coverage, CI wiring, and the final application audit follow in separate increments.
