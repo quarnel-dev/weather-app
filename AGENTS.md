@@ -13,6 +13,7 @@ Update existing documents as work progresses; create new ones only when needed. 
 - State problems and tradeoffs directly; explain when you disagree with a proposal.
 - Reuse existing components and styles unless a redesign has been agreed.
 - Do not create commits or push changes to GitHub without the user's instruction.
+- The user creates pull requests. Do not open one unless they explicitly request it.
 - Use `codex <codex@openai.com>` as both author and committer. Verify the local Git configuration before committing.
 - Keep commits focused on one change. Commit messages must contain only a subject, without a body or co-author trailers.
 - Avoid explanatory code comments. Use existing designs; show new loading, empty, or error states as plain text until their design is agreed.
