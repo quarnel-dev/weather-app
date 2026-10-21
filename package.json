@@ -7,6 +7,7 @@
     "build": "NODE_OPTIONS=--max-old-space-size=4096 next build",
     "start": "next start",
     "lint": "eslint",
+    "typecheck": "next typegen && NODE_OPTIONS=--max-old-space-size=4096 tsc --noEmit",
     "test": "vitest run"
   },
   "dependencies": {
