@@ -28,3 +28,19 @@ The user acts as lead developer and reviews scope and design. Do not commit or p
 - Production server HTTP checks: `/cn/suzhou` lists Jiangsu and Anhui with distinct links; `/ru/moscow-524901` redirects with HTTP 308 to `/ru/moscow`; unknown/mismatched city IDs return 404.
 - Live weather checks: `/ru/moscow`, `/cn/suzhou-1886760` and `/cn/suzhou-1793743` return HTTP 200 with rendered temperatures. These checks require the existing WEATHER_API_KEY binding and, in the Codex cloud environment, `NODE_USE_ENV_PROXY=1`.
 - The choice page reuses search item styles and existing theme variables. Browser appearance has not been visually reviewed.
+
+## App stability scope
+
+Branch: `feat/app-stability`, based on `main` at `1bd91d0`.
+
+The lead approved the following scope, with implementation awaiting a separate explicit green light:
+
+1. Add page error handling and recovery while keeping search usable.
+2. Verify connected user flows and fix confirmed problems.
+3. Add persistent Playwright browser tests; the new development dependency is approved.
+4. Integrate browser checks into CI and update agent working notes in this directory.
+5. Review the entire application after implementation, fix discovered defects, and repeat relevant checks.
+
+Preserve the existing design and use plain text for new states. Leave README changes for later work together with the lead. Keep commits atomic, with subject-only messages and `codex <codex@openai.com>` as author and committer. The lead creates the Draft PR and decides when to merge.
+
+At this preparation stage, only branch publication and this scope note are authorized. Do not begin implementation until the lead explicitly gives the green light.
