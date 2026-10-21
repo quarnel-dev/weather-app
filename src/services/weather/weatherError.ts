@@ -12,7 +12,10 @@ const messages: Record<WeatherErrorCode, string> = {
 }
 
 export class WeatherServiceError extends Error {
-  constructor(readonly code: WeatherErrorCode, readonly status?: number) {
+  constructor(
+    readonly code: WeatherErrorCode,
+    readonly status?: number
+  ) {
     super(messages[code])
     this.name = 'WeatherServiceError'
   }

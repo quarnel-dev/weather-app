@@ -12,8 +12,6 @@ import Search from '@/components/search/Search'
 import { WeatherCardServer } from '@/components/weathercard/WeatherCard.server'
 import RememberCity from '@/components/remembercity/RememberCity'
 
-
-
 interface Props {
   params: Promise<{ country: string; city: string }>
 }
@@ -38,11 +36,11 @@ export default async function Page({ params }: Props) {
                   <span>
                     <span className={searchStyles.cityName}>{candidate.name}</span>
                     <span className={s.region}>{candidate.admin1 || 'Region unavailable'}</span>
-                    <span className={s.region}>{candidate.lat}, {candidate.lon}</span>
+                    <span className={s.region}>
+                      {candidate.lat}, {candidate.lon}
+                    </span>
                   </span>
-                  <span className={searchStyles.countryName}>
-                    {countryMap.get(candidate.country) ?? candidate.country}
-                  </span>
+                  <span className={searchStyles.countryName}>{countryMap.get(candidate.country) ?? candidate.country}</span>
                 </Link>
               </li>
             ))}
@@ -55,7 +53,6 @@ export default async function Page({ params }: Props) {
   const found = matches[0]
   const canonicalUrl = cityUrl(found)
   if (`/${country}/${city}` !== canonicalUrl) permanentRedirect(canonicalUrl)
-
 
   return (
     <main className={s.main}>

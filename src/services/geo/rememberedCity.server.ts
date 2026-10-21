@@ -13,7 +13,7 @@ export function resolveRememberedCity(value: string | undefined): City | null {
 
   if (/^[1-9]\d{0,15}$/.test(value)) {
     const id = Number(value)
-    return Number.isSafeInteger(id) ? cityById.get(id) ?? null : null
+    return Number.isSafeInteger(id) ? (cityById.get(id) ?? null) : null
   }
 
   try {

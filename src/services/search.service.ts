@@ -28,7 +28,7 @@ export function searchCities(query: string): City[] {
 
   const result: City[] = []
   const matchingCountries = new Set(
-    [...countryMap].filter(([code, name]) => normalize(code).includes(q) || normalize(name).includes(q)).map(([code]) => code),
+    [...countryMap].filter(([code, name]) => normalize(code).includes(q) || normalize(name).includes(q)).map(([code]) => code)
   )
 
   for (const { city, name } of searchIndex) {

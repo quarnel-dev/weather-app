@@ -7,6 +7,9 @@
     "build": "NODE_OPTIONS=--max-old-space-size=4096 next build",
     "start": "next start",
     "lint": "eslint",
+    "typecheck": "next typegen && NODE_OPTIONS=--max-old-space-size=4096 tsc --noEmit",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "test": "vitest run"
   },
   "dependencies": {
@@ -24,6 +27,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.4.2",
     "jsdom": "^27.4.0",
+    "prettier": "^3.9.10",
     "typescript": "^5",
     "vitest": "^4.1.12"
   }

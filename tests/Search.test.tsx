@@ -32,7 +32,9 @@ test('keeps region labels, canonical links, and accessible keyboard selection', 
   render(<Search />)
   const input = await search()
   expect(screen.getByRole('status').textContent).toBe('Searching...')
-  await act(async () => { await vi.advanceTimersByTimeAsync(250) })
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(250)
+  })
 
   expect(screen.getAllByRole('option')).toHaveLength(2)
   expect(screen.getByText('· Jiangsu')).toBeTruthy()
@@ -50,7 +52,9 @@ test('renders a plain error message when the server fails', async () => {
   vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false, status: 500 }))
   render(<Search />)
   await search()
-  await act(async () => { await vi.advanceTimersByTimeAsync(250) })
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(250)
+  })
   expect(screen.getByRole('alert').textContent).toContain('Search is unavailable')
   expect(screen.queryByRole('listbox')).toBeNull()
 })
@@ -59,10 +63,11 @@ test('renders a plain empty message when no cities match', async () => {
   vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => ({ results: [] }) }))
   render(<Search />)
   await search()
-  await act(async () => { await vi.advanceTimersByTimeAsync(250) })
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(250)
+  })
   expect(screen.getByRole('status').textContent).toBe('No cities found.')
 })
-
 
 test('releases native input focus after keyboard selection so another search can start', async () => {
   vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => ({ results }) }))
@@ -70,12 +75,16 @@ test('releases native input focus after keyboard selection so another search can
   const input = screen.getByRole('combobox') as HTMLInputElement
   act(() => input.focus())
   fireEvent.change(input, { target: { value: 'Suzhou' } })
-  await act(async () => { await vi.advanceTimersByTimeAsync(250) })
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(250)
+  })
   fireEvent.keyDown(input, { key: 'Enter' })
   expect(document.activeElement).not.toBe(input)
   act(() => input.focus())
   fireEvent.change(input, { target: { value: 'Moscow' } })
-  await act(async () => { await vi.advanceTimersByTimeAsync(250) })
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(250)
+  })
   expect(input.getAttribute('aria-expanded')).toBe('true')
 })
 
@@ -83,7 +92,9 @@ test('makes outgoing suggestions inert and hides them from accessibility navigat
   vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => ({ results }) }))
   render(<Search />)
   const input = await search()
-  await act(async () => { await vi.advanceTimersByTimeAsync(250) })
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(250)
+  })
   expect(screen.getByRole('listbox')).toBeTruthy()
   fireEvent.change(input, { target: { value: 'Moscow' } })
   expect(screen.queryByRole('listbox')).toBeNull()

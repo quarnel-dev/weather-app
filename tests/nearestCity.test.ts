@@ -44,8 +44,16 @@ describe('nearest database city', () => {
   })
 
   test.each([
-    [NaN, 0], [0, Infinity], [91, 0], [-91, 0], [0, 181], [0, -181],
-    ['51', 0], [null, 0], [0, undefined], [[], 0],
+    [NaN, 0],
+    [0, Infinity],
+    [91, 0],
+    [-91, 0],
+    [0, 181],
+    [0, -181],
+    ['51', 0],
+    [null, 0],
+    [0, undefined],
+    [[], 0],
   ])('rejects invalid coordinates: %s, %s', (lat, lon) => {
     expect(findNearestCity(lat as number, lon as number)).toBeNull()
   })

@@ -1,0 +1,7 @@
+node_modules/
+.next/
+coverage/
+next-env.d.ts
+*.tsbuildinfo
+package-lock.json
+src/data/
