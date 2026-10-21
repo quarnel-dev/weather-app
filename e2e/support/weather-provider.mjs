@@ -94,6 +94,7 @@ globalThis.fetch = async function (input, options) {
     lon: url.searchParams.get('lon'),
     mode,
     aborted: false,
+    completed: false,
   }
   requests.push(entry)
   if (url.pathname !== '/data/2.5/weather') throw new Error('Unexpected provider endpoint in browser tests')
@@ -104,6 +105,7 @@ globalThis.fetch = async function (input, options) {
     controller.abort()
   }
   const finish = () => {
+    entry.completed = true
     active.delete(controller)
     options?.signal?.removeEventListener('abort', abort)
   }
