@@ -107,7 +107,7 @@
   font-size: 15px;
   font-weight: 400;
   color: var(--text-color);
-  white-space: nowrap;
+  white-space: normal;
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -115,8 +115,15 @@
 .countryName {
   font-size: 13px;
   color: var(--muted-color);
-  white-space: nowrap;
-  flex-shrink: 0;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  max-width: 50%;
+  text-align: right;
+}
+
+.itemLink > span:first-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .admin1 {
