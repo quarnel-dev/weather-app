@@ -42,6 +42,7 @@ export default function SearchResults({ results, listId, activeIndex, onSelect }
         >
           <Link
             href={city.url}
+            tabIndex={-1}
             className={s.itemLink}
             prefetch={false}
             onClick={(event) => {
