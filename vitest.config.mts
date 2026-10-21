@@ -12,6 +12,7 @@ export default defineConfig({
   test: {
     restoreMocks: true,
     unstubGlobals: true,
+    unstubEnvs: true,
     maxWorkers: 2,
     projects: [
       { extends: true, test: { name: 'server', environment: 'node', include: ['tests/**/*.test.ts'] } },
