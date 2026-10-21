@@ -3,13 +3,17 @@ import { resolveRememberedCity, REMEMBERED_CITY_MAX_AGE } from '@/services/geo/r
 import { rememberCity } from '@/services/geo/rememberCity.action'
 import { resolveLocation } from '@/services/geo/resolveLocation.action'
 import { cityById } from '@/services/cities.index'
+import Page from '@/app/page'
 
-const { get, set } = vi.hoisted(() => ({ get: vi.fn(), set: vi.fn() }))
+const { get, set, redirect } = vi.hoisted(() => ({ get: vi.fn(), set: vi.fn(), redirect: vi.fn() }))
 vi.mock('next/headers', () => ({ cookies: async () => ({ get, set }) }))
+vi.mock('next/navigation', () => ({ redirect }))
+vi.mock('@/components/home/Home', () => ({ default: () => null }))
 
 beforeEach(() => {
   get.mockReset()
   set.mockReset()
+  redirect.mockReset().mockImplementation(() => { throw new Error('Redirect') })
 })
 
 describe('remembered city resolution', () => {
@@ -76,6 +80,24 @@ describe('remembering a city', () => {
     } finally {
       vi.unstubAllEnvs()
     }
+  })
+})
+
+describe('homepage preference handling', () => {
+  test.each([
+    ['1886760', '/cn/suzhou-1886760'],
+    ['1793743', '/cn/suzhou-1793743'],
+    ['{"country":"ru","city":"moscow"}', '/ru/moscow'],
+  ])('redirects a saved preference to its canonical address: %s', async (value, url) => {
+    get.mockReturnValue({ value })
+    await expect(Page()).rejects.toThrow('Redirect')
+    expect(redirect).toHaveBeenCalledWith(url)
+  })
+
+  test.each([undefined, '999999999', '{"country":"cn","city":"suzhou"}', '{"country":"//evil.test","city":"moscow"}'])('keeps the homepage available for an invalid or missing preference: %s', async (value) => {
+    get.mockReturnValue(value === undefined ? undefined : { value })
+    expect(await Page()).toBeTruthy()
+    expect(redirect).not.toHaveBeenCalled()
   })
 })
 
