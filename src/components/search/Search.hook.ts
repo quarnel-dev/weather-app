@@ -1,66 +1,131 @@
 'use client'
 
-import { useState, useId, useRef } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
-import { searchCities } from '@/services/search.service'
+import { fetchCityResults } from '@/services/citySearch.client'
+import { MAX_SEARCH_LENGTH, MIN_SEARCH_LENGTH, SEARCH_DEBOUNCE_MS, SEARCH_REQUEST_TIMEOUT_MS } from '@/services/search.constants'
+import type { CitySearchResult } from '@/types/CitySearchResult.type'
+import { normalize } from '@/utils/normalize'
 
-import { cityUrl } from '@/utils/cityUrl'
-
-import type { City } from '@/types/City.type'
+type SearchStatus = 'idle' | 'loading' | 'success' | 'error'
 
 export function useSearch() {
   const [query, setQuery] = useState('')
-  const [results, setResults] = useState<City[]>([])
+  const [results, setResults] = useState<CitySearchResult[]>([])
+  const [status, setStatus] = useState<SearchStatus>('idle')
   const [activeIndex, setActiveIndex] = useState(-1)
   const [isFocused, setIsFocused] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
+  const requestRef = useRef<AbortController | null>(null)
   const listId = useId()
   const router = useRouter()
-  const open = results.length > 0
+  const open = isFocused && results.length > 0
+
+  useEffect(() => {
+    const value = normalize(query)
+    if (!isFocused || value.length < MIN_SEARCH_LENGTH || value.length > MAX_SEARCH_LENGTH) return
+
+    const controller = new AbortController()
+    requestRef.current = controller
+    let requestTimeout: ReturnType<typeof setTimeout> | undefined
+    const timer = setTimeout(async () => {
+      requestTimeout = setTimeout(() => {
+        if (controller.signal.aborted) return
+        controller.abort()
+        setStatus('error')
+      }, SEARCH_REQUEST_TIMEOUT_MS)
+
+      try {
+        const matches = await fetchCityResults(value, controller.signal)
+        if (controller.signal.aborted) return
+        setResults(matches)
+        setActiveIndex(-1)
+        setStatus('success')
+      } catch {
+        if (!controller.signal.aborted) setStatus('error')
+      } finally {
+        clearTimeout(requestTimeout)
+      }
+    }, SEARCH_DEBOUNCE_MS)
+
+    return () => {
+      clearTimeout(timer)
+      clearTimeout(requestTimeout)
+      controller.abort()
+    }
+  }, [query, isFocused])
+
+  function resetSearch(value: string) {
+    requestRef.current?.abort()
+    setResults([])
+    setActiveIndex(-1)
+    const length = normalize(value).length
+    setStatus(length >= MIN_SEARCH_LENGTH && length <= MAX_SEARCH_LENGTH ? 'loading' : 'idle')
+  }
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    setQuery(e.target.value)
-    setResults(searchCities(e.target.value))
+    const value = e.target.value
+    resetSearch(value)
+    setQuery(value)
+  }
+
+  function handleBlur() {
+    requestRef.current?.abort()
+    setIsFocused(false)
+    setResults([])
     setActiveIndex(-1)
+    setStatus('idle')
+  }
+
+  function handleFocus() {
+    resetSearch(query)
+    setIsFocused(true)
+  }
+
+  function handleSelect() {
+    handleBlur()
+    inputRef.current?.blur()
   }
 
   function handleKeyDown(e: React.KeyboardEvent) {
+    if (e.nativeEvent?.isComposing || e.nativeEvent?.keyCode === 229) return
+
+    if (e.key === 'Escape') {
+      e.preventDefault()
+      handleSelect()
+      return
+    }
     if (!open) return
+
     const actions: Record<string, () => void> = {
       ArrowDown: () => setActiveIndex((i) => Math.min(i + 1, results.length - 1)),
-
       ArrowUp: () => setActiveIndex((i) => Math.max(i - 1, 0)),
-
-      Escape: () => {
-        setResults([])
-        setActiveIndex(-1)
-        inputRef.current?.blur()
-      },
-
       Enter: () => {
-        const index = activeIndex >= 0 ? activeIndex : 0
-        if (results[index]) router.push(cityUrl(results[index]))
+        const selected = results[activeIndex >= 0 ? activeIndex : 0]
+        if (selected) {
+          router.push(selected.url)
+          handleSelect()
+        }
       },
     }
     actions[e.key]?.()
     if (e.key in actions) e.preventDefault()
   }
 
-  function handleBlur() {
-    setIsFocused(false)
-    setResults([])
-    setActiveIndex(-1)
-  }
-
-  function handleFocus() {
-    setIsFocused(true)
-    if (query) setResults(searchCities(query))
+  let message = ''
+  if (isFocused) {
+    if (normalize(query).length > MAX_SEARCH_LENGTH) message = `Use up to ${MAX_SEARCH_LENGTH} characters.`
+    else if (status === 'loading') message = 'Searching...'
+    else if (status === 'error') message = 'Search is unavailable. Try again by editing your query or refocusing the field.'
+    else if (status === 'success' && results.length === 0) message = 'No cities found.'
   }
 
   return {
     query,
     results,
+    status,
+    message,
     activeIndex,
     isFocused,
     open,
@@ -70,5 +135,6 @@ export function useSearch() {
     handleFocus,
     handleKeyDown,
     handleBlur,
+    handleSelect,
   }
 }
