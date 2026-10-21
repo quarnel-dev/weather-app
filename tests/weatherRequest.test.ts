@@ -125,4 +125,34 @@ describe('weather request boundary', () => {
     expect(new URL(String(fetch.mock.calls[1][0])).searchParams.get('appid')).toBe('replacement-test-key')
   })
 
+  test('shares one pending provider request for simultaneous calls at the same coordinates', async () => {
+    let finish!: (value: Response) => void
+    fetch.mockImplementation(() => new Promise(resolve => { finish = resolve }))
+    const first = requestWeather('weather', city)
+    const second = requestWeather('weather', { ...city })
+    expect(fetch).toHaveBeenCalledOnce()
+    finish(Response.json({ shared: true }))
+    expect(await Promise.all([first, second])).toEqual([{ shared: true }, { shared: true }])
+    expect(vi.getTimerCount()).toBe(0)
+  })
+
+  test('clears a failed shared request so the next call can retry', async () => {
+    fetch.mockResolvedValueOnce(new Response('{}', { status: 503 })).mockResolvedValueOnce(Response.json({ recovered: true }))
+    const outcomes = await Promise.allSettled([requestWeather('weather', city), requestWeather('weather', city)])
+    expect(outcomes.every(outcome => outcome.status === 'rejected')).toBe(true)
+    expect(fetch).toHaveBeenCalledOnce()
+    expect(await requestWeather('weather', city)).toEqual({ recovered: true })
+    expect(fetch).toHaveBeenCalledTimes(2)
+  })
+
+  test('does not share requests across different endpoints or coordinates', async () => {
+    fetch.mockImplementation(async () => Response.json({}))
+    await Promise.all([
+      requestWeather('weather', city),
+      requestWeather('forecast', city),
+      requestWeather('weather', { ...city, lat: '33.63611' }),
+      requestWeather('weather', { ...city, lon: '116.97889' }),
+    ])
+    expect(fetch).toHaveBeenCalledTimes(4)
+  })
 })

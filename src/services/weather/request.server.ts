@@ -5,6 +5,8 @@ import { WeatherServiceError } from './weatherError'
 
 type Location = Pick<City, 'lat' | 'lon'>
 
+const pendingRequests = new Map<string, Promise<unknown>>()
+
 export function validateWeatherRequest(city: Location): void {
   if (!city || typeof city.lat !== 'string' || typeof city.lon !== 'string' || !city.lat.trim() || !city.lon.trim()) {
     throw new WeatherServiceError('invalid_coordinates')
@@ -21,6 +23,20 @@ export function validateWeatherRequest(city: Location): void {
 
 export async function requestWeather(endpoint: 'weather' | 'forecast', city: Location): Promise<unknown> {
   validateWeatherRequest(city)
+  const key = JSON.stringify([endpoint, city.lat, city.lon])
+  const pending = pendingRequests.get(key)
+  if (pending) return pending
+
+  const request = performRequest(endpoint, city)
+  pendingRequests.set(key, request)
+  try {
+    return await request
+  } finally {
+    pendingRequests.delete(key)
+  }
+}
+
+async function performRequest(endpoint: 'weather' | 'forecast', city: Location): Promise<unknown> {
   const params = new URLSearchParams({
     lat: city.lat, lon: city.lon, appid: process.env.WEATHER_API_KEY!, units: 'metric', lang: 'en',
   })
