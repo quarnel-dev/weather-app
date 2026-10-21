@@ -1,9 +1,11 @@
 import assert from 'node:assert/strict'
 import { test, vi } from 'vitest'
-import cities from '@/data/cities.json'
 import { findCities, searchCities } from '@/services/search.service'
 import { cityUrl } from '@/utils/cityUrl'
 import { getWeather, getForecast } from '@/services/weather.service'
+import { City } from '@/types/City.type'
+
+import cities from '@/data/cities.json'
 
 test('unique city keeps its short URL', () => {
   const [moscow] = findCities('ru', 'moscow')
@@ -40,8 +42,10 @@ test('search retains same-name cities with different IDs', () => {
 })
 
 test('every database record has a unique URL that resolves to that exact ID', () => {
+  const allCities = cities as City[]
   const urls = new Set()
-  for (const city of cities) {
+
+  for (const city of allCities) {
     const url = cityUrl(city)
     assert.ok(!urls.has(url), `Duplicate URL for city ${city.id}: ${url}`)
     urls.add(url)
