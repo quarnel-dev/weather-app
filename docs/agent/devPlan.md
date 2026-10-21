@@ -33,7 +33,7 @@ The user acts as lead developer and reviews scope and design. Do not commit or p
 
 Branch: `feat/app-stability`, based on `main` at `1bd91d0`.
 
-The lead approved the following scope, with implementation awaiting a separate explicit green light:
+The lead approved the following scope and explicitly gave the green light to implement it in this branch:
 
 1. Add page error handling and recovery while keeping search usable.
 2. Verify connected user flows and fix confirmed problems.
@@ -43,4 +43,4 @@ The lead approved the following scope, with implementation awaiting a separate e
 
 Preserve the existing design and use plain text for new states. Leave README changes for later work together with the lead. Keep commits atomic, with subject-only messages and `codex <codex@openai.com>` as author and committer. The lead creates the Draft PR and decides when to merge.
 
-At this preparation stage, only branch publication and this scope note are authorized. Do not begin implementation until the lead explicitly gives the green light.
+Implement and validate one coherent increment at a time, then commit and push it before continuing. Draft PR #6 already exists; keep it as a draft and let the lead handle review and merge. Do not rewrite completed development into a batch of retrospective commits.

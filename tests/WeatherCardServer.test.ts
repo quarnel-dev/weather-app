@@ -25,9 +25,18 @@ test('renders current weather without requesting a forecast or writing a log', a
   expect(log).not.toHaveBeenCalled()
 })
 
-test('preserves typed failures for the page error-handling task', async () => {
+test('renders a safe recovery message for a known service failure', async () => {
+  const log = vi.spyOn(console, 'error').mockImplementation(() => {})
   const failure = new WeatherServiceError('timeout')
   getWeather.mockRejectedValue(failure)
-  await expect(WeatherCardServer({ city })).rejects.toBe(failure)
+  const result = await WeatherCardServer({ city })
+  expect(result.props).toEqual({ message: 'The weather request timed out. Try again.', retryable: true })
+  expect(log).toHaveBeenCalledWith('Weather request failed', { code: 'timeout', status: undefined })
   expect(getForecast).not.toHaveBeenCalled()
+})
+
+test('preserves unexpected failures for the local error boundary', async () => {
+  const failure = new Error('Unexpected internal detail')
+  getWeather.mockRejectedValue(failure)
+  await expect(WeatherCardServer({ city })).rejects.toBe(failure)
 })

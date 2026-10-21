@@ -16,6 +16,7 @@ Update existing documents as work progresses; create new ones only when needed. 
 - The user creates pull requests. Do not open one unless they explicitly request it.
 - Use `codex <codex@openai.com>` as both author and committer. Verify the local Git configuration before committing.
 - Keep commits focused on one change. Commit messages must contain only a subject, without a body or co-author trailers.
+- Commit and push each completed, checked increment during development. Do not postpone all commits until the end or reconstruct the history afterward.
 - Avoid explanatory code comments. Use existing designs; show new loading, empty, or error states as plain text until their design is agreed.
 
 ## Validation
