@@ -16,12 +16,12 @@ export interface Weather {
   humidity: number
 
   windSpeed: number
-  windDeg: number
+  windDeg: number | null
 
   clouds: number
 
-  sunrise: number
-  sunset: number
+  sunrise: number | null
+  sunset: number | null
 
   coord: {
     lat: number
