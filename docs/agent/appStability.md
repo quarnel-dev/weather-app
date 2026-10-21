@@ -34,3 +34,5 @@ The recovery suite passes 28 production browser checks across desktop and mobile
 Connected navigation adds 20 desktop/mobile checks: distinct same-name selections, keyboard and pointer/touch navigation, secure cookie migration, invalid preferences, canonical redirects, slow-request navigation, and browser Back/Forward with matching remembered IDs. All passed.
 
 Geolocation adds 14 desktop/mobile checks: exact coordinate identity for both Suzhou records, denied/unsupported browsers, no nearby settlement, the real five-second browser watchdog, and the ten-second action deadline. Manual city navigation completes while the old location action remains blocked; releasing its response cannot replace the chosen city. All passed.
+
+CI now keeps the existing Project checks job and adds Browser checks on a separate runner. The browser job installs Chromium with Linux dependencies, builds the isolated application, runs both device projects without real secrets, and uploads the HTML report and failure details for seven days, including failed runs. GitHub branch protection can require the new Browser checks status after the lead reviews it.
