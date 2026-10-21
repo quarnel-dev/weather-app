@@ -14,18 +14,21 @@ beforeEach(() => {
 afterEach(() => vi.useRealTimers())
 
 describe('weather request boundary', () => {
-  test.each(['weather', 'forecast'] as const)('uses exact coordinates, metric units, and a server-side key for %s', async (endpoint) => {
-    fetch.mockResolvedValue(Response.json({ value: 42 }))
-    expect(await requestWeather(endpoint, city)).toEqual({ value: 42 })
-    const [input, options] = fetch.mock.calls[0]
-    const url = new URL(String(input))
-    expect(url.origin).toBe('https://api.openweathermap.org')
-    expect(url.pathname).toBe(`/data/2.5/${endpoint}`)
-    expect(Object.fromEntries(url.searchParams)).toEqual({ ...city, appid: 'test-weather-key', units: 'metric', lang: 'en' })
-    expect(options?.signal).toBeInstanceOf(AbortSignal)
-    expect(options?.cache).toBe('no-store')
-    expect(vi.getTimerCount()).toBe(0)
-  })
+  test.each(['weather', 'forecast'] as const)(
+    'uses exact coordinates, metric units, and a server-side key for %s',
+    async (endpoint) => {
+      fetch.mockResolvedValue(Response.json({ value: 42 }))
+      expect(await requestWeather(endpoint, city)).toEqual({ value: 42 })
+      const [input, options] = fetch.mock.calls[0]
+      const url = new URL(String(input))
+      expect(url.origin).toBe('https://api.openweathermap.org')
+      expect(url.pathname).toBe(`/data/2.5/${endpoint}`)
+      expect(Object.fromEntries(url.searchParams)).toEqual({ ...city, appid: 'test-weather-key', units: 'metric', lang: 'en' })
+      expect(options?.signal).toBeInstanceOf(AbortSignal)
+      expect(options?.cache).toBe('no-store')
+      expect(vi.getTimerCount()).toBe(0)
+    }
+  )
 
   test.each([undefined, '', '  '])('does not call the provider without a configured key: %s', async (value) => {
     vi.stubEnv('WEATHER_API_KEY', value)
@@ -35,10 +38,18 @@ describe('weather request boundary', () => {
   })
 
   test.each([
-    { lat: '', lon: '0' }, { lat: ' ', lon: '0' }, { lat: '91', lon: '0' },
-    { lat: '-91', lon: '0' }, { lat: '0', lon: '181' }, { lat: '0', lon: '-181' },
-    { lat: 'NaN', lon: '0' }, { lat: '0', lon: 'Infinity' }, { lat: 'no', lon: '0' },
-    { lat: 51, lon: '0' }, { lat: '0', lon: null }, null,
+    { lat: '', lon: '0' },
+    { lat: ' ', lon: '0' },
+    { lat: '91', lon: '0' },
+    { lat: '-91', lon: '0' },
+    { lat: '0', lon: '181' },
+    { lat: '0', lon: '-181' },
+    { lat: 'NaN', lon: '0' },
+    { lat: '0', lon: 'Infinity' },
+    { lat: 'no', lon: '0' },
+    { lat: 51, lon: '0' },
+    { lat: '0', lon: null },
+    null,
   ])('does not send invalid coordinates: %j', async (value) => {
     await expect(requestWeather('weather', value as typeof city)).rejects.toMatchObject({ code: 'invalid_coordinates' })
     expect(fetch).not.toHaveBeenCalled()
@@ -74,7 +85,11 @@ describe('weather request boundary', () => {
   })
 
   test('classifies a disconnected body as a network failure', async () => {
-    const body = new ReadableStream({ start(controller) { controller.error(new TypeError('Connection closed')) } })
+    const body = new ReadableStream({
+      start(controller) {
+        controller.error(new TypeError('Connection closed'))
+      },
+    })
     fetch.mockResolvedValue(new Response(body))
     await expect(requestWeather('weather', city)).rejects.toMatchObject({ code: 'network' })
   })
@@ -91,9 +106,14 @@ describe('weather request boundary', () => {
   test('bounds body reading by the same deadline as response headers', async () => {
     let finishBody!: (value: unknown) => void
     const response = new Response()
-    vi.spyOn(response, 'json').mockImplementation(() => new Promise(resolve => { finishBody = resolve }))
+    vi.spyOn(response, 'json').mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          finishBody = resolve
+        })
+    )
     fetch.mockImplementation(async () => {
-      await new Promise(resolve => setTimeout(resolve, 6000))
+      await new Promise((resolve) => setTimeout(resolve, 6000))
       return response
     })
     const failure = expect(requestWeather('weather', city)).rejects.toMatchObject({ code: 'timeout' })
@@ -106,7 +126,12 @@ describe('weather request boundary', () => {
 
   test('does not read a response that arrives after the request deadline', async () => {
     let finish!: (value: Response) => void
-    fetch.mockImplementation(() => new Promise(resolve => { finish = resolve }))
+    fetch.mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          finish = resolve
+        })
+    )
     const response = Response.json({ late: true })
     const json = vi.spyOn(response, 'json')
     const failure = expect(requestWeather('weather', city)).rejects.toMatchObject({ code: 'timeout' })
@@ -127,7 +152,12 @@ describe('weather request boundary', () => {
 
   test('shares one pending provider request for simultaneous calls at the same coordinates', async () => {
     let finish!: (value: Response) => void
-    fetch.mockImplementation(() => new Promise(resolve => { finish = resolve }))
+    fetch.mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          finish = resolve
+        })
+    )
     const first = requestWeather('weather', city)
     const second = requestWeather('weather', { ...city })
     expect(fetch).toHaveBeenCalledOnce()
@@ -139,7 +169,7 @@ describe('weather request boundary', () => {
   test('clears a failed shared request so the next call can retry', async () => {
     fetch.mockResolvedValueOnce(new Response('{}', { status: 503 })).mockResolvedValueOnce(Response.json({ recovered: true }))
     const outcomes = await Promise.allSettled([requestWeather('weather', city), requestWeather('weather', city)])
-    expect(outcomes.every(outcome => outcome.status === 'rejected')).toBe(true)
+    expect(outcomes.every((outcome) => outcome.status === 'rejected')).toBe(true)
     expect(fetch).toHaveBeenCalledOnce()
     expect(await requestWeather('weather', city)).toEqual({ recovered: true })
     expect(fetch).toHaveBeenCalledTimes(2)

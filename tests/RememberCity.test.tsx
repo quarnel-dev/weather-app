@@ -21,6 +21,8 @@ test('remembers an opened city and updates the ID on client-side navigation', as
 
 test('does not prevent rendering when saving the preference fails', async () => {
   rememberCity.mockRejectedValue(new Error('Offline'))
-  await act(async () => { render(<RememberCity id={524901} />) })
+  await act(async () => {
+    render(<RememberCity id={524901} />)
+  })
   expect(rememberCity).toHaveBeenCalledWith(524901)
 })

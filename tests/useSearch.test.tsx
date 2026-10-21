@@ -8,10 +8,20 @@ const { push } = vi.hoisted(() => ({ push: vi.fn() }))
 vi.mock('next/navigation', () => ({ useRouter: () => ({ push }) }))
 
 const moscow: CitySearchResult = {
-  id: 524901, name: 'Moscow', admin1: 'Moscow', country: 'RU', countryName: 'Russia', url: '/ru/moscow',
+  id: 524901,
+  name: 'Moscow',
+  admin1: 'Moscow',
+  country: 'RU',
+  countryName: 'Russia',
+  url: '/ru/moscow',
 }
 const suzhou: CitySearchResult = {
-  id: 1886760, name: 'Suzhou', admin1: 'Jiangsu', country: 'CN', countryName: 'China', url: '/cn/suzhou-1886760',
+  id: 1886760,
+  name: 'Suzhou',
+  admin1: 'Jiangsu',
+  country: 'CN',
+  countryName: 'China',
+  url: '/cn/suzhou-1886760',
 }
 const response = (results: CitySearchResult[]) => ({ ok: true, json: async () => ({ results }) })
 const change = (value: string) => ({ target: { value } }) as ChangeEvent<HTMLInputElement>
@@ -31,7 +41,9 @@ afterEach(() => {
 })
 
 async function waitForSearch() {
-  await act(async () => { await vi.advanceTimersByTimeAsync(250) })
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(250)
+  })
 }
 
 describe('asynchronous city search', () => {
@@ -56,11 +68,17 @@ describe('asynchronous city search', () => {
       result.current.handleChange(change('Lo'))
     })
     expect(result.current.message).toBe('Searching...')
-    await act(async () => { await vi.advanceTimersByTimeAsync(200) })
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(200)
+    })
     act(() => result.current.handleChange(change(' LON ')))
-    await act(async () => { await vi.advanceTimersByTimeAsync(249) })
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(249)
+    })
     expect(fetchMock).not.toHaveBeenCalled()
-    await act(async () => { await vi.advanceTimersByTimeAsync(1) })
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(1)
+    })
     expect(fetchMock).toHaveBeenCalledTimes(1)
     expect(fetchMock.mock.calls[0][0]).toBe('/api/cities?q=lon')
     expect(result.current.results).toEqual([moscow, suzhou])
@@ -69,7 +87,11 @@ describe('asynchronous city search', () => {
 
   test('cancels old requests and ignores their late responses', async () => {
     let resolveOld!: (value: ReturnType<typeof response>) => void
-    fetchMock.mockReturnValueOnce(new Promise((resolve) => { resolveOld = resolve }))
+    fetchMock.mockReturnValueOnce(
+      new Promise((resolve) => {
+        resolveOld = resolve
+      })
+    )
     const { result } = renderHook(useSearch)
     act(() => {
       result.current.handleFocus()
@@ -82,7 +104,9 @@ describe('asynchronous city search', () => {
     expect(result.current.results).toEqual([])
     fetchMock.mockResolvedValueOnce(response([moscow]))
     await waitForSearch()
-    await act(async () => { resolveOld(response([suzhou])) })
+    await act(async () => {
+      resolveOld(response([suzhou]))
+    })
     expect(result.current.results).toEqual([moscow])
   })
 
@@ -199,7 +223,6 @@ describe('asynchronous city search', () => {
   })
 })
 
-
 test.each(['Enter', 'Escape', 'ArrowDown', 'ArrowUp'])('does not intercept %s during IME composition', async (pressed) => {
   const { result } = renderHook(useSearch)
   act(() => {
@@ -227,20 +250,27 @@ test('preserves IME input when the browser reports legacy key code 229', async (
   expect(result.current.open).toBe(true)
 })
 
-
 test('reports a stalled search after ten seconds and ignores its late result', async () => {
   let resolve!: (value: ReturnType<typeof response>) => void
-  fetchMock.mockReturnValueOnce(new Promise((complete) => { resolve = complete }))
+  fetchMock.mockReturnValueOnce(
+    new Promise((complete) => {
+      resolve = complete
+    })
+  )
   const { result } = renderHook(useSearch)
   act(() => {
     result.current.handleFocus()
     result.current.handleChange(change('Moscow'))
   })
   await waitForSearch()
-  await act(async () => { await vi.advanceTimersByTimeAsync(10000) })
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(10000)
+  })
   expect(result.current.status).toBe('error')
   expect((fetchMock.mock.calls[0][1].signal as AbortSignal).aborted).toBe(true)
-  await act(async () => { resolve(response([moscow])) })
+  await act(async () => {
+    resolve(response([moscow]))
+  })
   expect(result.current.status).toBe('error')
   expect(result.current.results).toEqual([])
 })
@@ -256,14 +286,22 @@ test('does not let an aborted request timeout replace a newer successful search'
   act(() => result.current.handleChange(change('Moscow')))
   fetchMock.mockResolvedValueOnce(response([moscow]))
   await waitForSearch()
-  await act(async () => { await vi.advanceTimersByTimeAsync(10000) })
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(10000)
+  })
   expect(result.current.status).toBe('success')
   expect(result.current.results).toEqual([moscow])
 })
 
 test('ignores a response body that completes after the query changes', async () => {
   let resolveBody!: (value: { results: CitySearchResult[] }) => void
-  fetchMock.mockResolvedValueOnce({ ok: true, json: () => new Promise((resolve) => { resolveBody = resolve }) })
+  fetchMock.mockResolvedValueOnce({
+    ok: true,
+    json: () =>
+      new Promise((resolve) => {
+        resolveBody = resolve
+      }),
+  })
   const { result } = renderHook(useSearch)
   act(() => {
     result.current.handleFocus()
@@ -273,6 +311,8 @@ test('ignores a response body that completes after the query changes', async () 
   act(() => result.current.handleChange(change('Moscow')))
   fetchMock.mockResolvedValueOnce(response([moscow]))
   await waitForSearch()
-  await act(async () => { resolveBody({ results: [suzhou] }) })
+  await act(async () => {
+    resolveBody({ results: [suzhou] })
+  })
   expect(result.current.results).toEqual([moscow])
 })

@@ -38,8 +38,8 @@ test('validates and maps forecast responses through the same request boundary', 
   const fetch = vi.fn().mockResolvedValue(Response.json(forecastPayload()))
   vi.stubGlobal('fetch', fetch)
   const result = await getForecast({ lat: '31.30408', lon: '120.59538' })
-  expect(result.map(item => item.date)).toEqual(['2026-10-21 12:00:00', '2026-10-22 12:00:00'])
-  expect(result.every(item => item.icon === 'rain')).toBe(true)
+  expect(result.map((item) => item.date)).toEqual(['2026-10-21 12:00:00', '2026-10-22 12:00:00'])
+  expect(result.every((item) => item.icon === 'rain')).toBe(true)
   expect(new URL(fetch.mock.calls[0][0]).pathname).toBe('/data/2.5/forecast')
 })
 

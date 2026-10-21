@@ -13,7 +13,9 @@ vi.mock('@/components/home/Home', () => ({ default: () => null }))
 beforeEach(() => {
   get.mockReset()
   set.mockReset()
-  redirect.mockReset().mockImplementation(() => { throw new Error('Redirect') })
+  redirect.mockReset().mockImplementation(() => {
+    throw new Error('Redirect')
+  })
 })
 
 describe('remembered city resolution', () => {
@@ -23,12 +25,28 @@ describe('remembered city resolution', () => {
   })
 
   test.each([
-    undefined, '', '0', '-524901', '524901.5', '0524901', '999999999', '9007199254740992',
-    'null', '[]', '{}', 'true', '"524901"', '{', 'x'.repeat(513),
-    '{"country":"//evil.test","city":"moscow"}', '{"country":"ru","city":"//evil.test"}',
-    '{"country":"ru","city":{}}', '{"country":12,"city":"moscow"}',
+    undefined,
+    '',
+    '0',
+    '-524901',
+    '524901.5',
+    '0524901',
+    '999999999',
+    '9007199254740992',
+    'null',
+    '[]',
+    '{}',
+    'true',
+    '"524901"',
+    '{',
+    'x'.repeat(513),
+    '{"country":"//evil.test","city":"moscow"}',
+    '{"country":"ru","city":"//evil.test"}',
+    '{"country":"ru","city":{}}',
+    '{"country":12,"city":"moscow"}',
     '{"country":"ru","city":"moscow?next=https://evil.test"}',
-    '{"country":"ru","city":"moscow%2Fother"}', '{"country":"ru","city":"unknown-city"}',
+    '{"country":"ru","city":"moscow%2Fother"}',
+    '{"country":"ru","city":"unknown-city"}',
   ])('ignores an invalid cookie: %s', (value) => {
     expect(resolveRememberedCity(value)).toBeNull()
   })
@@ -51,7 +69,11 @@ describe('remembering a city', () => {
   test('stores only its database ID with a bounded, HTTP-only cookie', async () => {
     await rememberCity(1886760)
     expect(set).toHaveBeenCalledWith('lastCity', '1886760', {
-      httpOnly: true, secure: false, sameSite: 'lax', path: '/', maxAge: REMEMBERED_CITY_MAX_AGE,
+      httpOnly: true,
+      secure: false,
+      sameSite: 'lax',
+      path: '/',
+      maxAge: REMEMBERED_CITY_MAX_AGE,
     })
   })
 
@@ -94,11 +116,14 @@ describe('homepage preference handling', () => {
     expect(redirect).toHaveBeenCalledWith(url)
   })
 
-  test.each([undefined, '999999999', '{"country":"cn","city":"suzhou"}', '{"country":"//evil.test","city":"moscow"}'])('keeps the homepage available for an invalid or missing preference: %s', async (value) => {
-    get.mockReturnValue(value === undefined ? undefined : { value })
-    expect(await Page()).toBeTruthy()
-    expect(redirect).not.toHaveBeenCalled()
-  })
+  test.each([undefined, '999999999', '{"country":"cn","city":"suzhou"}', '{"country":"//evil.test","city":"moscow"}'])(
+    'keeps the homepage available for an invalid or missing preference: %s',
+    async (value) => {
+      get.mockReturnValue(value === undefined ? undefined : { value })
+      expect(await Page()).toBeTruthy()
+      expect(redirect).not.toHaveBeenCalled()
+    }
+  )
 })
 
 describe('coordinate resolution with the real database', () => {

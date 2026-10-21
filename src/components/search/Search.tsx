@@ -10,8 +10,22 @@ import SearchResults from './SearchResults'
 import { MAX_SEARCH_LENGTH } from '@/services/search.constants'
 
 export default function Search() {
-  const { query, results, status, message, activeIndex, isFocused, open, inputRef, listId, handleChange, handleFocus, handleKeyDown, handleBlur, handleSelect } =
-    useSearch()
+  const {
+    query,
+    results,
+    status,
+    message,
+    activeIndex,
+    isFocused,
+    open,
+    inputRef,
+    listId,
+    handleChange,
+    handleFocus,
+    handleKeyDown,
+    handleBlur,
+    handleSelect,
+  } = useSearch()
 
   return (
     <>
@@ -49,12 +63,14 @@ export default function Search() {
         />
 
         <AnimatePresence>
-          {open && (
-            <SearchResults results={results} listId={listId} activeIndex={activeIndex} onSelect={handleSelect} />
-          )}
+          {open && <SearchResults results={results} listId={listId} activeIndex={activeIndex} onSelect={handleSelect} />}
         </AnimatePresence>
       </div>
-      {message && <p id={`${listId}-status`} role={status === 'error' ? 'alert' : 'status'}>{message}</p>}
+      {message && (
+        <p id={`${listId}-status`} role={status === 'error' ? 'alert' : 'status'}>
+          {message}
+        </p>
+      )}
     </>
   )
 }

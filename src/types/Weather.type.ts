@@ -28,4 +28,3 @@ export interface Weather {
     lon: number
   }
 }
-

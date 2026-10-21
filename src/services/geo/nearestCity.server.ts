@@ -24,8 +24,8 @@ export function findNearestCity(lat: number, lon: number): City | null {
     if (Math.abs(latitudeDelta) > MAX_LATITUDE_DELTA) continue
 
     const longitudeDelta = Number(city.lon) * TO_RADIANS - longitude
-    const distance = Math.sin(latitudeDelta / 2) ** 2 +
-      Math.cos(latitude) * Math.cos(cityLatitude) * Math.sin(longitudeDelta / 2) ** 2
+    const distance =
+      Math.sin(latitudeDelta / 2) ** 2 + Math.cos(latitude) * Math.cos(cityLatitude) * Math.sin(longitudeDelta / 2) ** 2
 
     if (distance < shortest || (distance === shortest && (!nearest || city.id < nearest.id))) {
       shortest = distance

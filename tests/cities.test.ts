@@ -61,21 +61,27 @@ test('every database record has a unique URL that resolves to that exact ID', ()
 test('weather and forecast use the exact selected coordinates, never the city name', async () => {
   vi.stubEnv('WEATHER_API_KEY', 'test-weather-key')
   const requests: URL[] = []
-  vi.stubGlobal('fetch', vi.fn(async (url: string) => {
-    requests.push(new URL(url))
-    if (new URL(url).pathname.endsWith('/forecast')) {
-      return { ok: true, json: async () => ({ list: [] }) }
-    }
-    return {
-      ok: true,
-      json: async () => ({
-        name: 'Suzhou', sys: { country: 'CN', sunrise: 1, sunset: 2 },
-        main: { temp: 20, temp_min: 19, temp_max: 21, feels_like: 20, humidity: 50 },
-        weather: [{ description: 'clear sky', main: 'Clear', icon: '01d' }],
-        wind: { speed: 2, deg: 90 }, clouds: { all: 0 }, coord: { lat: 1, lon: 2 },
-      }),
-    }
-  }))
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(async (url: string) => {
+      requests.push(new URL(url))
+      if (new URL(url).pathname.endsWith('/forecast')) {
+        return { ok: true, json: async () => ({ list: [] }) }
+      }
+      return {
+        ok: true,
+        json: async () => ({
+          name: 'Suzhou',
+          sys: { country: 'CN', sunrise: 1, sunset: 2 },
+          main: { temp: 20, temp_min: 19, temp_max: 21, feels_like: 20, humidity: 50 },
+          weather: [{ description: 'clear sky', main: 'Clear', icon: '01d' }],
+          wind: { speed: 2, deg: 90 },
+          clouds: { all: 0 },
+          coord: { lat: 1, lon: 2 },
+        }),
+      }
+    })
+  )
   for (const city of findCities('cn', 'suzhou')) {
     await getWeather(city)
     await getForecast(city)

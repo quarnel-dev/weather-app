@@ -38,7 +38,11 @@ export async function requestWeather(endpoint: 'weather' | 'forecast', city: Loc
 
 async function performRequest(endpoint: 'weather' | 'forecast', city: Location): Promise<unknown> {
   const params = new URLSearchParams({
-    lat: city.lat, lon: city.lon, appid: process.env.WEATHER_API_KEY!, units: 'metric', lang: 'en',
+    lat: city.lat,
+    lon: city.lon,
+    appid: process.env.WEATHER_API_KEY!,
+    units: 'metric',
+    lang: 'en',
   })
   const controller = new AbortController()
   let timeout: ReturnType<typeof setTimeout> | undefined

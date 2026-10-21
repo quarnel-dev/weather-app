@@ -1,34 +1,34 @@
 .main {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
 }
 
 .cityChoices {
-    margin-top: 24px;
-    padding: 20px;
-    background: var(--card);
-    border: 2px solid var(--border-color);
-    border-radius: 20px;
+  margin-top: 24px;
+  padding: 20px;
+  background: var(--card);
+  border: 2px solid var(--border-color);
+  border-radius: 20px;
 }
 
 .cityChoices h1 {
-    text-align: left;
-    margin-bottom: 8px;
+  text-align: left;
+  margin-bottom: 8px;
 }
 
 .cityChoices p,
 .region {
-    color: var(--muted-color);
+  color: var(--muted-color);
 }
 
 .cityList {
-    list-style: none;
-    margin-top: 16px;
+  list-style: none;
+  margin-top: 16px;
 }
 
 .region {
-    display: block;
-    margin-top: 4px;
-    font-size: 14px;
+  display: block;
+  margin-top: 4px;
+  font-size: 14px;
 }

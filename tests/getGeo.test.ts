@@ -30,7 +30,9 @@ test('handles a permission denial and clears its fallback timer', async () => {
 })
 
 test('handles a synchronous browser error', async () => {
-  getCurrentPosition.mockImplementation(() => { throw new Error('Unavailable') })
+  getCurrentPosition.mockImplementation(() => {
+    throw new Error('Unavailable')
+  })
   expect(await getGeoClient()).toBeNull()
   expect(vi.getTimerCount()).toBe(0)
 })
@@ -43,7 +45,12 @@ test('stops waiting even if the browser never calls either callback', async () =
   expect(await result).toBeNull()
 })
 
-test.each([[NaN, 0], [0, Infinity], [91, 0], [0, -181]])('ignores invalid browser coordinates: %s, %s', async (latitude, longitude) => {
+test.each([
+  [NaN, 0],
+  [0, Infinity],
+  [91, 0],
+  [0, -181],
+])('ignores invalid browser coordinates: %s, %s', async (latitude, longitude) => {
   getCurrentPosition.mockImplementation((success) => success({ coords: { latitude, longitude } }))
   expect(await getGeoClient()).toBeNull()
 })
