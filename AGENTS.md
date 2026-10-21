@@ -21,6 +21,7 @@ Update existing documents as work progresses; create new ones only when needed. 
 
 ## Validation
 
-- Run relevant tests when changing logic; project commands are `npm test`, `npm run lint`, and `npm run build`.
+- Run relevant tests when changing logic. Final project checks are `npm run format:check`, `npm run lint`, `npm run typecheck`, `npm test`, and `npm run build`.
+- Browser checks use `npm run build:e2e` followed by `npm run test:e2e`. Rebuild after application changes; the runner starts the isolated production server itself. Install Chromium first with `npx playwright install chromium` (add `--with-deps` on a fresh Linux runner). See [`docs/agent/appStability.md`](docs/agent/appStability.md) for isolation, reports, and limitations.
 - Verify affected user flows. Distinguish automated tests, HTTP checks, and visual browser checks; do not present one as another.
 - In the Codex cloud environment, use `NODE_USE_ENV_PROXY=1` and the supplied TLS settings for Node.js requests to external APIs. Do not disable certificate verification. This setting may not be needed on the user's local machine.
