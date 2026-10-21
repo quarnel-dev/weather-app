@@ -7,6 +7,8 @@ import { City } from '@/types/City.type'
 
 import cities from '@/data/cities.json'
 
+vi.mock('next/cache', () => ({ unstable_cache: (callback: unknown) => callback }))
+
 test('unique city keeps its short URL', () => {
   const [moscow] = findCities('ru', 'moscow')
   assert.equal(moscow.id, 524901)
@@ -57,6 +59,7 @@ test('every database record has a unique URL that resolves to that exact ID', ()
 })
 
 test('weather and forecast use the exact selected coordinates, never the city name', async () => {
+  vi.stubEnv('WEATHER_API_KEY', 'test-weather-key')
   const requests: URL[] = []
   vi.stubGlobal('fetch', vi.fn(async (url: string) => {
     requests.push(new URL(url))
