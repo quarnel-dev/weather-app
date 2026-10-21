@@ -29,7 +29,7 @@ export default function Recovery({ message, retryable = true, onRetry }: Props) 
           {pending ? 'Retrying...' : 'Try again'}
         </button>
       )}
-      {pending && <p role="status">Retrying weather...</p>}
+      {pending && <p role="status">Trying again...</p>}
     </div>
   )
 }
