@@ -26,7 +26,7 @@ test('keeps same-name city links distinct and restores the selected record befor
 
 test('can search again after selecting the current city and navigate with mouse or touch', async ({ page, context }, info) => {
   await page.goto('/ru/moscow')
-  await expect(page.getByText('20°C', { exact: true })).toBeVisible()
+  await expect(page.getByRole('main').getByText('20°C', { exact: true })).toBeVisible()
   const input = page.getByRole('combobox')
   await input.fill('Moscow')
   await expect(page.getByRole('listbox')).toBeVisible()
