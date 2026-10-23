@@ -11,6 +11,7 @@ import searchStyles from '@/components/search/Search.module.css'
 import Search from '@/components/search/Search'
 import { WeatherCardServer } from '@/components/weathercard/WeatherCard.server'
 import RememberCity from '@/components/remembercity/RememberCity'
+import WeatherBoundary from '@/components/weathercard/WeatherBoundary'
 
 interface Props {
   params: Promise<{ country: string; city: string }>
@@ -58,9 +59,11 @@ export default async function Page({ params }: Props) {
     <main className={s.main}>
       <RememberCity id={found.id} />
       <Search />
-      <Suspense fallback={<div>Loading...</div>}>
-        <WeatherCardServer city={found} />
-      </Suspense>
+      <WeatherBoundary key={found.id}>
+        <Suspense fallback={<p role="status">Loading weather...</p>}>
+          <WeatherCardServer city={found} />
+        </Suspense>
+      </WeatherBoundary>
     </main>
   )
 }

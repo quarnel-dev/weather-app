@@ -10,7 +10,9 @@
     "typecheck": "next typegen && NODE_OPTIONS=--max-old-space-size=4096 tsc --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "test": "vitest run"
+    "test": "vitest run",
+    "build:e2e": "E2E_TEST_MODE=1 npm run build",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "motion": "^12.38.0",
@@ -20,6 +22,7 @@
     "server-only": "^0.0.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.64.1",
     "@testing-library/react": "^16.3.3",
     "@types/node": "^20",
     "@types/react": "^19",

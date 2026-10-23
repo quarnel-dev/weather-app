@@ -59,6 +59,17 @@ test('renders a plain error message when the server fails', async () => {
   expect(screen.queryByRole('listbox')).toBeNull()
 })
 
+test('keeps popup links out of the page tab sequence while the combobox handles keyboard selection', async () => {
+  vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => ({ results }) }))
+  render(<Search />)
+  await search()
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(250)
+  })
+  expect((screen.getByRole('combobox') as HTMLInputElement).tabIndex).toBe(0)
+  expect(screen.getAllByRole('link').every((link) => link.tabIndex === -1)).toBe(true)
+})
+
 test('renders a plain empty message when no cities match', async () => {
   vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => ({ results: [] }) }))
   render(<Search />)
