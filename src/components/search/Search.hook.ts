@@ -16,6 +16,7 @@ export function useSearch() {
   const [status, setStatus] = useState<SearchStatus>('idle')
   const [activeIndex, setActiveIndex] = useState(-1)
   const [isFocused, setIsFocused] = useState(false)
+  const [retryAttempt, setRetryAttempt] = useState(0)
   const inputRef = useRef<HTMLInputElement>(null)
   const requestRef = useRef<AbortController | null>(null)
   const listId = useId()
@@ -54,7 +55,7 @@ export function useSearch() {
       clearTimeout(requestTimeout)
       controller.abort()
     }
-  }, [query, isFocused])
+  }, [query, isFocused, retryAttempt])
 
   function resetSearch(value: string) {
     requestRef.current?.abort()
@@ -79,8 +80,16 @@ export function useSearch() {
   }
 
   function handleFocus() {
+    if (isFocused) return
     resetSearch(query)
     setIsFocused(true)
+  }
+
+  function retrySearch() {
+    if (!isFocused || status !== 'error') return
+    resetSearch(query)
+    setRetryAttempt((attempt) => attempt + 1)
+    inputRef.current?.focus()
   }
 
   function handleSelect() {
@@ -136,5 +145,6 @@ export function useSearch() {
     handleKeyDown,
     handleBlur,
     handleSelect,
+    retrySearch,
   }
 }
