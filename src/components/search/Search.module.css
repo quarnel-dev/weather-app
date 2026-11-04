@@ -144,3 +144,68 @@
   letter-spacing: inherit;
   color: inherit;
 }
+
+.feedback {
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 18px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.feedbackIcon {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  color: var(--muted-color);
+}
+
+.errorIcon {
+  color: var(--accent-orange);
+}
+
+.feedbackText {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.hint {
+  margin-top: 4px;
+  color: var(--muted-color);
+  font-size: 13px;
+}
+
+.retry {
+  flex-shrink: 0;
+  padding: 8px 12px;
+  border: 1px solid var(--hover-border-color);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--accent-purple);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.retry:hover {
+  border-color: var(--accent-purple);
+}
+
+.retry:focus-visible {
+  outline: 2px solid var(--accent-purple);
+  outline-offset: 3px;
+}
+
+@media (max-width: 600px) {
+  .feedback {
+    flex-wrap: wrap;
+  }
+  .feedbackText {
+    flex-basis: calc(100% - 32px);
+  }
+  .retry {
+    margin-left: 32px;
+  }
+}

@@ -103,6 +103,7 @@ export function useSearch() {
     if (e.key === 'Escape') {
       e.preventDefault()
       handleSelect()
+      if (e.target instanceof HTMLElement) e.target.blur()
       return
     }
     if (!open) return
@@ -126,7 +127,7 @@ export function useSearch() {
   if (isFocused) {
     if (normalize(query).length > MAX_SEARCH_LENGTH) message = `Use up to ${MAX_SEARCH_LENGTH} characters.`
     else if (status === 'loading') message = 'Searching...'
-    else if (status === 'error') message = 'Search is unavailable. Try again by editing your query or refocusing the field.'
+    else if (status === 'error') message = 'Search is temporarily unavailable.'
     else if (status === 'success' && results.length === 0) message = 'No cities found.'
   }
 

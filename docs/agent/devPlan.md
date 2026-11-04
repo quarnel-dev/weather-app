@@ -57,7 +57,7 @@ Agreed tasks:
 2. **Current-weather card — completed and accepted by the lead.** Build from the supplied screenshots: city, temperature, conditions, feels-like value, weather icon, and gradient background.
 3. **Forecast timeline — completed and accepted by the lead.** Add within that card, with horizontal scrolling on small screens.
 4. **Weather details — completed and accepted by the lead.** Add metric cards and sunrise/sunset using the appropriate units and city-local times.
-5. **Daily forecast — implemented and validated, awaiting lead review.** Add the daily forecast with conditions, icons, and temperature ranges.
+5. **Daily forecast — completed; spacing correction delivered for lead review.** Add the daily forecast with conditions, icons, and temperature ranges.
 6. Review the complete responsive page, spacing, loading, and recovery states with the lead.
 
 Use the existing OpenWeather access: five-day forecasts at three-hour intervals. One Call access returned HTTP 401 and requires a separate subscription; do not promise hourly or seven-day data. Reuse existing global styles, fonts, search, and CSS Modules. Adapt each block as it is built.
@@ -133,3 +133,15 @@ A normal production server using the real provider rendered five available dates
 Task 5 spacing correction requested by the lead: maximum-temperature labels were right-aligned inside their fixed-width columns, adding unused column width to the gap after each track. Maximum labels now align left, while minimum labels stay right-aligned. The shared grid gaps remain 16 px on desktop and 10 px on mobile. No forecast logic or tests were changed.
 
 Spacing correction validation: formatting, lint, typechecking, all 328 unit tests, and both production builds passed. Direct browser text-bound measurements across all six rendered rows confirmed equal 16 px gaps at 1280 px and equal 10 px gaps at 390/320 px, without page overflow. No new tests were added for this CSS alignment fix; the complete browser suite was not repeated. Screenshots are outside the repository at `/workspace/artifacts/daily-spacing-desktop.png`, `/workspace/artifacts/daily-spacing-mobile.png`, and `/workspace/artifacts/daily-spacing-small.png`.
+
+### Search feedback UI
+
+The lead approved a separate search UI task before the final page review: put loading, empty results, errors, and the defensive query-length message into the existing dropdown surface; add a retry button without changing the query; preserve keyboard interaction, focus, and accessibility announcements. No README or PR changes are authorized.
+
+`d56c387` adds an explicit retry attempt to the existing debounced/cancellable search effect. Refocusing within the active widget does not reset it. Its new hook test confirms the same normalized query is retried and the typed text is preserved; 26 affected checks, lint, and typechecking passed before the increment was pushed.
+
+Feedback now sits inside the positioned search wrapper and reuses the dropdown surface, blur, global palette, and existing masks. Loading uses the existing spinner; empty results add a short city/country hint; errors have a concise message and a keyboard-accessible retry action. Only actual suggestions form the listbox. The wrapper closes only when focus leaves the whole widget; retry restores input focus, and Escape also releases focus from the retry button. Two additional component checks cover that focus behavior.
+
+All 32 affected search/navigation/layout production browser checks passed, including keyboard retry, mobile touch retry, unchanged query, empty-state dismissal, and existing late-response protection. The browser scenarios were extended rather than replaced. Manual production-browser checks on both home and city pages at 1280/390/320 px confirmed every feedback state, fixed input/weather positions, no horizontal overflow or page errors, and closure when tabbing away from retry. Screenshots are outside the repository at `/workspace/artifacts/search-{loading,empty,error}-{desktop,mobile}.png`, with `-home` variants for the homepage.
+
+Formatting, lint, typechecking, all **331 Vitest tests in 24 files**, and both production builds passed locally. The full browser suite follows after this checked UI increment. No dependencies, new global colors, explanatory source comments, or README changes were added.

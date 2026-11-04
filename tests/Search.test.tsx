@@ -48,14 +48,14 @@ test('keeps region labels, canonical links, and accessible keyboard selection', 
   expect(input.getAttribute('aria-expanded')).toBe('false')
 })
 
-test('renders a plain error message when the server fails', async () => {
+test('renders an error panel with a retry action when the server fails', async () => {
   vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false, status: 500 }))
   render(<Search />)
   await search()
   await act(async () => {
     await vi.advanceTimersByTimeAsync(250)
   })
-  expect(screen.getByRole('alert').textContent).toContain('Search is unavailable')
+  expect(screen.getByRole('alert').textContent).toContain('Search is temporarily unavailable')
   expect(screen.queryByRole('listbox')).toBeNull()
 })
 
@@ -70,7 +70,7 @@ test('keeps popup links out of the page tab sequence while the combobox handles 
   expect(screen.getAllByRole('link').every((link) => link.tabIndex === -1)).toBe(true)
 })
 
-test('renders a plain empty message when no cities match', async () => {
+test('renders an empty message with a search hint when no cities match', async () => {
   vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => ({ results: [] }) }))
   render(<Search />)
   await search()
@@ -110,4 +110,48 @@ test('makes outgoing suggestions inert and hides them from accessibility navigat
   fireEvent.change(input, { target: { value: 'Moscow' } })
   expect(screen.queryByRole('listbox')).toBeNull()
   expect(screen.getByRole('listbox', { hidden: true }).hasAttribute('inert')).toBe(true)
+})
+
+test('keeps the error open when focusing retry and returns focus to the query on retry', async () => {
+  const fetch = vi
+    .fn()
+    .mockResolvedValueOnce({ ok: false, status: 503 })
+    .mockResolvedValueOnce({ ok: true, json: async () => ({ results }) })
+  vi.stubGlobal('fetch', fetch)
+  render(<Search />)
+  const input = screen.getByRole('combobox')
+  act(() => input.focus())
+  fireEvent.change(input, { target: { value: 'Suzhou' } })
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(250)
+  })
+  const retry = screen.getByRole('button', { name: 'Try again' })
+  act(() => retry.focus())
+  expect(document.activeElement).toBe(retry)
+  expect(screen.getByRole('alert')).toBeTruthy()
+  fireEvent.click(retry)
+  expect(document.activeElement).toBe(input)
+  expect(screen.getByRole('status').textContent).toBe('Searching...')
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(250)
+  })
+  expect(fetch).toHaveBeenCalledTimes(2)
+  expect(screen.getAllByRole('option')).toHaveLength(2)
+  expect((input as HTMLInputElement).value).toBe('Suzhou')
+})
+
+test('closes the error and releases retry button focus with Escape', async () => {
+  vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false, status: 503 }))
+  render(<Search />)
+  const input = screen.getByRole('combobox')
+  act(() => input.focus())
+  fireEvent.change(input, { target: { value: 'Suzhou' } })
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(250)
+  })
+  const retry = screen.getByRole('button', { name: 'Try again' })
+  act(() => retry.focus())
+  fireEvent.keyDown(retry, { key: 'Escape' })
+  expect(screen.queryByRole('alert')).toBeNull()
+  expect(document.activeElement).not.toBe(retry)
 })

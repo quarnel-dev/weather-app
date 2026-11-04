@@ -145,7 +145,7 @@ describe('asynchronous city search', () => {
     })
     await waitForSearch()
     expect(result.current.status).toBe('error')
-    expect(result.current.message).toContain('Search is unavailable')
+    expect(result.current.message).toContain('Search is temporarily unavailable')
     act(() => result.current.handleBlur())
     act(() => result.current.handleFocus())
     await waitForSearch()
