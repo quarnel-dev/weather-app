@@ -33,3 +33,13 @@ test('keeps keyboard-selected search results inside a short viewport', async ({ 
   await expect(options.first()).toBeInViewport({ ratio: 1 })
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
 })
+
+test('wraps long ambiguous city names without overflowing a narrow page', async ({ page, provider }) => {
+  await page.setViewportSize({ width: 320, height: 900 })
+  await page.goto('/mx/solidaridad-fraccionamiento')
+  await expect(page.getByRole('heading', { name: 'Which Solidaridad [Fraccionamiento]?' })).toBeVisible()
+  await expect(page.getByRole('combobox')).toBeVisible()
+  await page.evaluate(() => document.fonts.ready)
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
+  expect((await provider.state()).requests).toEqual([])
+})
