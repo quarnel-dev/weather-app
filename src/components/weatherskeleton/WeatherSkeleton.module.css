@@ -50,3 +50,24 @@
   white-space: nowrap;
   border: 0;
 }
+
+.reveal {
+  animation: reveal 320ms ease-out backwards;
+}
+
+@keyframes reveal {
+  from {
+    opacity: 0.35;
+    filter: blur(8px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    animation: none;
+  }
+}

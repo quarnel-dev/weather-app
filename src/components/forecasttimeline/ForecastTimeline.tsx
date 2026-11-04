@@ -1,3 +1,4 @@
+import skeleton from '@/components/weatherskeleton/WeatherSkeleton.module.css'
 import type { Forecast } from '@/types/Forecast.type'
 import type { Weather } from '@/types/Weather.type'
 import s from './ForecastTimeline.module.css'
@@ -18,7 +19,7 @@ export function ForecastTimeline({ forecast, weather, timezoneOffset, now }: Pro
   if (upcoming.length === 0) return <p>No upcoming forecast is available.</p>
 
   return (
-    <ul className={s.list} tabIndex={0} aria-label="Forecast timeline">
+    <ul className={`${s.list} ${skeleton.reveal}`} tabIndex={0} aria-label="Forecast timeline">
       <li className={s.item}>
         <span className={s.time}>Now</span>
         <i className={`i-weather-${weather.icon} ${s.icon}`} role="img" aria-label={weather.description} />

@@ -1,5 +1,6 @@
 import type { Weather } from '@/types/Weather.type'
 import s from './WeatherDetails.module.css'
+import skeleton from '@/components/weatherskeleton/WeatherSkeleton.module.css'
 import { SkeletonValue } from '@/components/weatherskeleton/SkeletonValue'
 
 export function WeatherDetails({ weather }: { weather?: Weather }) {
@@ -29,7 +30,9 @@ export function WeatherDetails({ weather }: { weather?: Weather }) {
               <i className={`i-${metric.icon}`} aria-hidden="true" />
               {metric.name}
             </h2>
-            <p className={s.value}>{weather ? (metric.value ?? '—') : <SkeletonValue width="3ch" />}</p>
+            <p className={`${s.value} ${weather ? skeleton.reveal : ''}`}>
+              {weather ? (metric.value ?? '—') : <SkeletonValue width="3ch" />}
+            </p>
             <p className={s.unit}>{metric.unit}</p>
           </section>
         ))}
@@ -46,7 +49,7 @@ export function WeatherDetails({ weather }: { weather?: Weather }) {
                 <i className={`i-${event.icon}`} aria-hidden="true" />
                 {event.name}
               </h2>
-              <p className={s.value}>
+              <p className={`${s.value} ${weather ? skeleton.reveal : ''}`}>
                 {!weather ? (
                   <SkeletonValue />
                 ) : local ? (

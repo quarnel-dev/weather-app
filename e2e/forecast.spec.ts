@@ -116,6 +116,7 @@ test('keeps weather and metric positions stable through both loading stages', as
   expect(Math.abs(metricsDuring!.height - metricsBefore!.height)).toBeLessThan(2)
   await expect(hero.getByRole('listitem')).toHaveCount(8)
   await expect(page.getByRole('region', { name: 'Daily forecast', exact: true }).getByRole('list')).toBeVisible()
+  expect(await hero.getByRole('list').evaluate((element) => getComputedStyle(element).animationName)).toBe('none')
   const heroAfter = await hero.boundingBox()
   const metricsAfter = await metrics.boundingBox()
   expect(Math.abs(heroAfter!.height - heroBefore!.height)).toBeLessThan(2)

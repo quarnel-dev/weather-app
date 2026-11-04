@@ -22,11 +22,11 @@ export function WeatherCard({ weather, city, children }: Props) {
         </h1>
       </div>
       {weather ? (
-        <i className={`i-weather-${weather.icon} ${s.weatherIcon}`} aria-hidden="true" />
+        <i className={`i-weather-${weather.icon} ${s.weatherIcon} ${skeleton.reveal}`} aria-hidden="true" />
       ) : (
         <span className={`${s.weatherIcon} ${skeleton.icon}`} aria-hidden="true" />
       )}
-      <div className={s.conditions}>
+      <div className={`${s.conditions} ${weather ? skeleton.reveal : ''}`}>
         <p
           className={s.temperature}
           aria-label={weather ? `${weather ? weather.temp : <SkeletonValue width="2ch" />} degrees Celsius` : undefined}

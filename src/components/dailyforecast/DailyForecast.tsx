@@ -1,3 +1,4 @@
+import skeleton from '@/components/weatherskeleton/WeatherSkeleton.module.css'
 import type { CSSProperties } from 'react'
 import type { DailyForecast as Day } from '@/types/DailyForecast.type'
 import s from './DailyForecast.module.css'
@@ -11,7 +12,7 @@ export function DailyForecast({ days, today }: { days: Day[]; today: string }) {
   const weekday = new Intl.DateTimeFormat('en', { weekday: 'short', timeZone: 'UTC' })
 
   return (
-    <ul className={s.list} aria-label="Daily forecast">
+    <ul className={`${s.list} ${skeleton.reveal}`} aria-label="Daily forecast">
       {days.map((day) => (
         <li key={day.date} className={s.row}>
           <time className={s.day} dateTime={day.date} title={day.date}>
