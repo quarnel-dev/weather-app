@@ -20,6 +20,15 @@
   --weather-gradient-purple: #301b46;
   --weather-border-color: #1c2436;
   --weather-icon-color: #9b9eb5;
+  --accent-blue: #49a3ff;
+  --accent-cyan: #00c9e8;
+  --accent-violet: #c379ff;
+  --accent-indigo: #8585ff;
+  --accent-orange: #ff9800;
+  --sunrise-start: #3c2110;
+  --sunrise-end: #352b10;
+  --sunset-start: #122545;
+  --sunset-end: #1b1c40;
 }
 
 html {
