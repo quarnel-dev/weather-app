@@ -57,3 +57,9 @@ h1 {
   font-weight: 700;
   text-align: center;
 }
+
+@media (max-width: 600px) {
+  body {
+    padding: 24px 16px;
+  }
+}

@@ -18,5 +18,5 @@ export async function WeatherCardServer({ city }: { city: City }) {
     console.error('Weather request failed', { code: error.code, status: error.status })
     return <Recovery {...weatherFailure(error)} />
   }
-  return <WeatherCard res={data} />
+  return <WeatherCard weather={data} city={city} />
 }

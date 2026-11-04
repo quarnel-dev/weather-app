@@ -2,15 +2,15 @@ import { test, expect } from './support/fixtures'
 import { denyGeolocation, rememberedCity } from './support/navigation'
 
 for (const city of [
-  { latitude: 31.30408, longitude: 120.59538, id: 1886760, name: 'Suzhou Jiangsu' },
-  { latitude: 33.63611, longitude: 116.97889, id: 1793743, name: 'Suzhou Anhui' },
+  { latitude: 31.30408, longitude: 120.59538, id: 1886760, name: 'Suzhou, CN · Jiangsu' },
+  { latitude: 33.63611, longitude: 116.97889, id: 1793743, name: 'Suzhou, CN · Anhui' },
 ]) {
   test(`resolves browser coordinates to the exact same-name record ${city.id}`, async ({ page, context, provider }) => {
     await context.grantPermissions(['geolocation'])
     await context.setGeolocation(city)
     await page.goto('/')
     await expect(page).toHaveURL(`/cn/suzhou-${city.id}`)
-    await expect(page.getByRole('main').getByText(city.name, { exact: true })).toBeVisible()
+    await expect(page.getByRole('heading', { level: 1, name: city.name, exact: true })).toBeVisible()
     await rememberedCity(context, city.id)
     const requests = (await provider.state()).requests
     expect(requests.length).toBeGreaterThan(0)

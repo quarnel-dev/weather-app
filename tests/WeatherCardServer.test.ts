@@ -19,10 +19,21 @@ test('renders current weather without requesting a forecast or writing a log', a
   const log = vi.spyOn(console, 'log')
   const markup = renderToStaticMarkup(await WeatherCardServer({ city }))
   expect(markup).toContain('Suzhou')
-  expect(markup).toContain('20°C')
+  expect(markup).toContain('aria-label="20 degrees Celsius"')
+  expect(markup).toContain('Feels like 21°')
   expect(getWeather).toHaveBeenCalledWith(city)
   expect(getForecast).not.toHaveBeenCalled()
   expect(log).not.toHaveBeenCalled()
+})
+
+test('labels weather with the selected database location instead of the provider station name', async () => {
+  getWeather.mockResolvedValue({ ...parseWeather(weatherPayload()), city: 'Nearby station', country: 'XX' })
+  const markup = renderToStaticMarkup(await WeatherCardServer({ city }))
+  expect(markup).toContain('Suzhou')
+  expect(markup).toContain('CN')
+  expect(markup).toContain('Jiangsu')
+  expect(markup).not.toContain('Nearby station')
+  expect(markup).not.toContain('XX')
 })
 
 test('renders a safe recovery message for a known service failure', async () => {
