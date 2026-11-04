@@ -82,6 +82,7 @@
 .forecast {
   grid-column: 1 / -1;
   min-width: 0;
+  min-height: 136px;
   margin-top: 32px;
   border-top: 1px solid var(--weather-border-color);
   padding-top: 24px;
