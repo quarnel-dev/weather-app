@@ -14,6 +14,9 @@ export interface Weather {
   icon: WeatherIcon
 
   humidity: number
+  pressure: number | null
+  visibility: number | null
+  timezoneOffset: number | null
 
   windSpeed: number
   windDeg: number | null

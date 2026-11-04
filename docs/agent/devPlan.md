@@ -49,7 +49,7 @@ The lead created PR #6 and merged the completed work. Its development workflow r
 
 Branch: `feat/weather-page`, based on the updated `main` at `12d3fd4`.
 
-The lead authorized creating and publishing the branch. Implementation has not started; work proceeds one task at a time, with the result shown before taking on the next task. The lead exclusively creates and manages the PR; do not edit its title, description, comments, or status.
+The lead authorized task 1 implementation, with atomic commits and pushes during development. Work proceeds one task at a time, with the result shown before taking on the next task. The lead exclusively creates and manages the PR; do not edit its title, description, comments, or status.
 
 Agreed tasks:
 
@@ -63,3 +63,5 @@ Agreed tasks:
 Use the existing OpenWeather access: five-day forecasts at three-hour intervals. One Call access returned HTTP 401 and requires a separate subscription; do not promise hourly or seven-day data. Reuse existing global styles, fonts, search, and CSS Modules. Adapt each block as it is built.
 
 This project targets one release. Keep functions and components readable and relatively small, avoid speculative abstractions and new infrastructure, and add tests only for meaningful changed logic or confirmed regressions. Preserve incremental, subject-only commits with Codex as author and committer. README remains reserved for joint work with the lead at the end.
+
+Task 1 progress: current weather now preserves pressure in hPa, visibility in metres, and the signed UTC offset in seconds. Missing values stay null, present values are validated, and the current-weather cache namespace is v2. Relevant parser/service/component tests (96), lint, and explicit typechecking passed before committing this increment. Forecast preparation follows separately.

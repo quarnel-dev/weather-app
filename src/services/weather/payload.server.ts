@@ -58,6 +58,8 @@ export function parseWeather(value: unknown): Weather {
   const clouds = record(data.clouds)
   const coord = record(data.coord)
   const condition = conditions(data.weather)
+  const timezoneOffset = optionalNumber(data.timezone, -43200, 50400)
+  if (timezoneOffset !== null && !Number.isInteger(timezoneOffset)) throw new WeatherServiceError('invalid_response')
   const country = sys.country === undefined ? '' : text(sys.country)
   if (country && !/^[A-Z]{2}$/.test(country)) throw new WeatherServiceError('invalid_response')
 
@@ -72,6 +74,9 @@ export function parseWeather(value: unknown): Weather {
     main: text(condition.main),
     icon: icon(condition.icon),
     humidity: number(main.humidity, 0, 100),
+    pressure: optionalNumber(main.pressure, 0),
+    visibility: optionalNumber(data.visibility, 0),
+    timezoneOffset,
     windSpeed: number(wind.speed, 0),
     windDeg: optionalNumber(wind.deg, 0, 360),
     clouds: number(clouds.all, 0, 100),
