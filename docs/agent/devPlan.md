@@ -49,15 +49,15 @@ The lead created PR #6 and merged the completed work. Its development workflow r
 
 Branch: `feat/weather-page`, based on the updated `main` at `12d3fd4`.
 
-The lead authorized task 4 after accepting task 3, with atomic commits and pushes during development. Work proceeds one task at a time, with the result shown before taking on the next task. The lead exclusively creates and manages the PR; do not edit its title, description, comments, or status.
+The lead authorized task 5 after reviewing task 4, with atomic commits and pushes during development. Work proceeds one task at a time, with the result shown before taking on the next task. The lead exclusively creates and manages the PR; do not edit its title, description, comments, or status.
 
 Agreed tasks:
 
 1. **Page data — completed and accepted by the lead.** Preserve pressure, visibility, and the city's UTC offset; retain the three-hour forecast points and group them by local date for daily temperature ranges.
 2. **Current-weather card — completed and accepted by the lead.** Build from the supplied screenshots: city, temperature, conditions, feels-like value, weather icon, and gradient background.
 3. **Forecast timeline — completed and accepted by the lead.** Add within that card, with horizontal scrolling on small screens.
-4. **Weather details — implemented and validated, awaiting lead review.** Add metric cards and sunrise/sunset using the appropriate units and city-local times.
-5. Add the daily forecast with conditions, icons, and temperature ranges.
+4. **Weather details — completed and accepted by the lead.** Add metric cards and sunrise/sunset using the appropriate units and city-local times.
+5. **Daily forecast — implemented and validated, awaiting lead review.** Add the daily forecast with conditions, icons, and temperature ranges.
 6. Review the complete responsive page, spacing, loading, and recovery states with the lead.
 
 Use the existing OpenWeather access: five-day forecasts at three-hour intervals. One Call access returned HTTP 401 and requires a separate subscription; do not promise hourly or seven-day data. Reuse existing global styles, fonts, search, and CSS Modules. Adapt each block as it is built.
@@ -115,3 +115,17 @@ The growing page now uses a minimum body height rather than a fixed viewport hei
 Task 4 final checks: formatting, lint, explicit TypeScript checking, **320 Vitest tests in 22 files**, the normal production build, the isolated production build, and all **80 existing production browser checks** passed locally. Three component tests were added; browser scenarios and their assertions were preserved. The implementation was committed and pushed as `c07163e` after focused checks, before this full validation.
 
 A normal production server using real OpenWeather data rendered all six detail cards on desktop and mobile without page errors or horizontal overflow. With the browser timezone set to Los Angeles, both solar labels matched their UTC datetimes shifted to Moscow's UTC+3. Home and 404 layouts were checked again at 320 px after their entrance animations finished. Live screenshots are outside the repository at `/workspace/artifacts/weather-details-desktop.png` and `/workspace/artifacts/weather-details-mobile.png`. No dependencies or README changes were added. Stop before task 5 for lead review; the PR remains exclusively managed by the lead.
+
+### Task 5 progress
+
+Pulled `feat/weather-page` before starting; it was already current at `604b834`. The lead authorized the daily forecast only and retains exclusive PR management. The Daily Forecast block follows the supplied reference, with all actual forecast dates, representative conditions/icons, and minimum/maximum temperature bars on a shared scale. It does not pad results to seven days or promise a fixed row count. The current provider supplies three-hour forecast points across five days, which can cover six local dates including partial days.
+
+The pure component and CSS were checked and pushed first in `ba17130`. Three component tests cover city-local Today/weekday labels, date tooltips, conditions, negative ranges, relative scale positions, equal temperatures, and empty results. They passed under both the default timezone and Pacific/Honolulu. On mobile, each row puts the temperature range below its date/icon/description. Existing global color tokens and mask icons are reused.
+
+`6378007` connects the block below the solar cards. Both forecast blocks use a small React-cached server reader, preserving the same forecast and observation timestamp within a render. The daily loader reuses the existing grouping helper, excludes dates before city-local today, skips loading when timezone metadata is missing, and preserves existing recovery policy. Its own Suspense and error boundary keep current weather, metrics, and search usable. Five focused server checks, all existing affected component checks, lint, typechecking, and the isolated production build passed before pushing this increment.
+
+The existing forecast browser scenarios now also check the daily block's streaming, sorted distinct dates, known-error retry, and unexpected-error containment/recovery. Eight targeted desktop/mobile browser checks passed, including the existing assertion that simultaneous cold page requests make exactly one provider request per endpoint. No browser scenarios or dependencies were added. Desktop, 390 px, and 320 px screenshots of the test-provider page were inspected without horizontal overflow.
+
+Task 5 final validation: formatting, lint, explicit TypeScript checking, **328 Vitest tests in 24 files**, both production builds, and all **80 production browser checks** passed locally. The eight additional unit/component checks exercise the new daily UI and loader. Existing browser tests retain their original assertions and also cover the daily block; no scenarios were removed.
+
+A normal production server using the real provider rendered five available dates at 1280, 390, and 320 px. Visual inspection and browser assertions confirmed city-local Today/weekday labels with a Los Angeles browser timezone, temperature segments fitting their tracks, no horizontal page overflow, and no page errors. Full-page screenshots are outside the repository at `/workspace/artifacts/daily-forecast-desktop.png`, `/workspace/artifacts/daily-forecast-mobile.png`, and `/workspace/artifacts/daily-forecast-small.png`. No new dependencies, global color tokens, or README changes were needed. Both feature increments were checked and pushed during implementation. Stop here before task 6 for lead review; the PR was not modified.
