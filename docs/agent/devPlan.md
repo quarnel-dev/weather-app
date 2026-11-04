@@ -55,7 +55,7 @@ Agreed tasks:
 
 1. **Page data — completed and accepted by the lead.** Preserve pressure, visibility, and the city's UTC offset; retain the three-hour forecast points and group them by local date for daily temperature ranges.
 2. **Current-weather card — completed and accepted by the lead.** Build from the supplied screenshots: city, temperature, conditions, feels-like value, weather icon, and gradient background.
-3. **Forecast timeline — in progress.** Add within that card, with horizontal scrolling on small screens.
+3. **Forecast timeline — implemented and validated, awaiting lead review.** Add within that card, with horizontal scrolling on small screens.
 4. Add metric cards and sunrise/sunset using the appropriate units and city-local times.
 5. Add the daily forecast with conditions, icons, and temperature ranges.
 6. Review the complete responsive page, spacing, loading, and recovery states with the lead.
@@ -88,7 +88,7 @@ Before committing the card increment, all four server-component tests, 34 existi
 
 Task 2 final checks: formatting, lint, explicit TypeScript checking, **308 Vitest tests in 19 files**, the normal build, the isolated build, and all **74 existing browser checks** passed locally. The additional unit test covers selected-location identity; no browser scenarios or dependencies were added. A separate normal production process used the real OpenWeather binding and passed desktop/mobile rendering with zero page errors. Visual checks also covered a negative three-digit temperature and the home/404 pages at 320 px after the shared padding change. Live screenshots are outside the repository at `/workspace/artifacts/weather-card-desktop.png` and `/workspace/artifacts/weather-card-mobile.png`.
 
-The palette/icon increment (`b0571e3`) and the checked card increment (`ef6290f`) were committed and pushed during development. Stop after this task for lead review. Do not start the timeline or edit the PR.
+The palette/icon increment (`b0571e3`) and the checked card increment (`ef6290f`) were committed and pushed during development. The card was delivered for lead review before separately authorized timeline work. PR management remains exclusively with the lead.
 
 ### Task 3 progress
 
@@ -99,3 +99,7 @@ The private browser provider now supports `/forecast` with 40 future three-hour 
 The current card now contains a separately streamed forecast section. A server loader captures forecast points and a timestamp together; Suspense keeps current weather/search visible during loading, known failures reuse the existing retry policy with a forecast-specific message, and a nested instance of the existing boundary contains unexpected forecast exceptions. Missing timezone metadata skips the forecast request and shows plain text. Before committing the integration, 17 focused unit/component checks, 34 production browser checks (including three new forecast scenarios per device), lint, typechecking, and the isolated build passed. Cache checks now wait for the forecast section, and simultaneous-cold-request checks require exactly one call to each endpoint rather than the previous weather-only count.
 
 Visual review found an 86 px card-height jump when the forecast finished. Reserving the row's height removes the jump; desktop and phone measurements now match before/after loading. Both production builds were repeated after this CSS change. Manual checks also confirmed no horizontal page overflow at 1280/390/320 px, native timeline scrolling, the lead's restored search blur, and an actual ten-second forecast-header timeout that aborts while preserving current weather. Final full Vitest validation passed 317 checks in 21 files; the complete browser suite follows.
+
+Task 3 final verification: formatting, lint, explicit typechecking, **317 Vitest tests in 21 files**, both production builds, and **80 production browser checks** passed locally. The browser total adds only three forecast scenarios on each device: independent streaming/search/mobile scrolling, known-error retry with preserved current weather/input, and unexpected-error containment/recovery without a document reload. Existing weather scenarios and assertions remain, with endpoint/cache expectations updated for the newly requested forecast.
+
+A normal production process also rendered real OpenWeather data on desktop and mobile with zero page errors. The browser timezone was deliberately Los Angeles; all seven future times and dates still matched Moscow's UTC+3 offset. Screenshots are at `/workspace/artifacts/forecast-timeline-desktop.png` and `/workspace/artifacts/forecast-timeline-mobile.png`, outside the repository. The timeline, fixture support, server integration, and layout correction were each committed and pushed as checked increments (`45dba8a`, `0a4e9da`, `a2b8cbf`, `aeba11f`). No dependencies or README changes were added; stop here before task 4 and leave the PR untouched.
