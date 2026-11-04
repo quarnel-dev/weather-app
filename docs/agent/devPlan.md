@@ -54,7 +54,7 @@ The lead authorized task 2 after reviewing task 1, with atomic commits and pushe
 Agreed tasks:
 
 1. **Page data — completed and accepted by the lead.** Preserve pressure, visibility, and the city's UTC offset; retain the three-hour forecast points and group them by local date for daily temperature ranges.
-2. **Current-weather card — in progress.** Build from the supplied screenshots: city, temperature, conditions, feels-like value, weather icon, and gradient background.
+2. **Current-weather card — implemented and validated, awaiting lead visual review.** Build from the supplied screenshots: city, temperature, conditions, feels-like value, weather icon, and gradient background.
 3. Add the forecast timeline within that card, with horizontal scrolling on small screens.
 4. Add metric cards and sunrise/sunset using the appropriate units and city-local times.
 5. Add the daily forecast with conditions, icons, and temperature ranges.
@@ -85,3 +85,7 @@ Use the supplied screenshots as the visual reference for the upper current-weath
 The card now renders the selected database city's name/country/region, current temperature, description, feels-like value, and decorative weather icon. It is a plain server-rendered component with CSS Modules. The global palette is reused; mobile outer padding is reduced at 600 px, and the temperature block spans the card below its heading/icon. The selected-city label is independent of provider station metadata. Existing identity checks now assert the full selected city/country/region heading; temperature visibility checks remain unchanged. The server-render test accounts for the smaller unit span and includes a regression for mismatched provider location names.
 
 Before committing the card increment, all four server-component tests, 34 existing navigation/geolocation browser checks, lint, typechecking, and the isolated production build passed. Desktop (1280 px), phone (390 px), and narrow-phone (320 px) screenshots were inspected, including the longest database city name. All fit horizontally with no browser page errors. Timeline, metrics, and daily cards remain separate tasks.
+
+Task 2 final checks: formatting, lint, explicit TypeScript checking, **308 Vitest tests in 19 files**, the normal build, the isolated build, and all **74 existing browser checks** passed locally. The additional unit test covers selected-location identity; no browser scenarios or dependencies were added. A separate normal production process used the real OpenWeather binding and passed desktop/mobile rendering with zero page errors. Visual checks also covered a negative three-digit temperature and the home/404 pages at 320 px after the shared padding change. Live screenshots are outside the repository at `/workspace/artifacts/weather-card-desktop.png` and `/workspace/artifacts/weather-card-mobile.png`.
+
+The palette/icon increment (`b0571e3`) and the checked card increment (`ef6290f`) were committed and pushed during development. Stop after this task for lead review. Do not start the timeline or edit the PR.
