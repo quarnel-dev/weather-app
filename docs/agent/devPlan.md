@@ -49,14 +49,14 @@ The lead created PR #6 and merged the completed work. Its development workflow r
 
 Branch: `feat/weather-page`, based on the updated `main` at `12d3fd4`.
 
-The lead authorized task 3 after reviewing task 2, with atomic commits and pushes during development. Work proceeds one task at a time, with the result shown before taking on the next task. The lead exclusively creates and manages the PR; do not edit its title, description, comments, or status.
+The lead authorized task 4 after accepting task 3, with atomic commits and pushes during development. Work proceeds one task at a time, with the result shown before taking on the next task. The lead exclusively creates and manages the PR; do not edit its title, description, comments, or status.
 
 Agreed tasks:
 
 1. **Page data — completed and accepted by the lead.** Preserve pressure, visibility, and the city's UTC offset; retain the three-hour forecast points and group them by local date for daily temperature ranges.
 2. **Current-weather card — completed and accepted by the lead.** Build from the supplied screenshots: city, temperature, conditions, feels-like value, weather icon, and gradient background.
-3. **Forecast timeline — implemented and validated, awaiting lead review.** Add within that card, with horizontal scrolling on small screens.
-4. Add metric cards and sunrise/sunset using the appropriate units and city-local times.
+3. **Forecast timeline — completed and accepted by the lead.** Add within that card, with horizontal scrolling on small screens.
+4. **Weather details — implementation in progress.** Add metric cards and sunrise/sunset using the appropriate units and city-local times.
 5. Add the daily forecast with conditions, icons, and temperature ranges.
 6. Review the complete responsive page, spacing, loading, and recovery states with the lead.
 
@@ -103,3 +103,11 @@ Visual review found an 86 px card-height jump when the forecast finished. Reserv
 Task 3 final verification: formatting, lint, explicit typechecking, **317 Vitest tests in 21 files**, both production builds, and **80 production browser checks** passed locally. The browser total adds only three forecast scenarios on each device: independent streaming/search/mobile scrolling, known-error retry with preserved current weather/input, and unexpected-error containment/recovery without a document reload. Existing weather scenarios and assertions remain, with endpoint/cache expectations updated for the newly requested forecast.
 
 A normal production process also rendered real OpenWeather data on desktop and mobile with zero page errors. The browser timezone was deliberately Los Angeles; all seven future times and dates still matched Moscow's UTC+3 offset. Screenshots are at `/workspace/artifacts/forecast-timeline-desktop.png` and `/workspace/artifacts/forecast-timeline-mobile.png`, outside the repository. The timeline, fixture support, server integration, and layout correction were each committed and pushed as checked increments (`45dba8a`, `0a4e9da`, `a2b8cbf`, `aeba11f`). No dependencies or README changes were added; stop here before task 4 and leave the PR untouched.
+
+### Task 4 progress
+
+The lead authorized the metric and solar cards: four metric columns on desktop, two on mobile, paired solar cards on desktop and stacked on mobile. The global palette and six CSS masks were committed and pushed first in `f7054ac`, after formatting and whitespace checks.
+
+A server-rendered WeatherDetails component reuses the already-fetched current weather. Wind is rounded to km/h; visibility is converted from metres to kilometres with one decimal when needed. Pressure stays in hPa and humidity in percent. Solar times use the city offset, with UTC datetimes and local-date tooltips; unavailable measurements, events, or timezone metadata show an em dash. No new request or dependency is introduced. Three focused component tests cover conversions, fractional offsets across midnight, zero values, and missing data; they also passed under Pacific/Honolulu.
+
+The growing page now uses a minimum body height rather than a fixed viewport height. Home/404 containers retain viewport centering. Desktop, 390 px, and 320 px screenshots were inspected; home and 404 checks at 320 px confirmed centering and no horizontal overflow. The private browser provider now supplies pressure and visibility, without adding browser scenarios. Focused component/server checks, lint, typechecking, and the isolated production build passed before committing this increment. Full verification follows.

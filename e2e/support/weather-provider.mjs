@@ -153,12 +153,20 @@ globalThis.fetch = async function (input, options) {
       cod: 200,
       name,
       sys: { country: lat > 50 ? 'RU' : 'CN', sunrise: 1761019200, sunset: 1761060000 },
-      main: { temp: mode === 'invalid' ? 'invalid' : 20, temp_min: 19, temp_max: 21, feels_like: 20, humidity: 50 },
+      main: {
+        temp: mode === 'invalid' ? 'invalid' : 20,
+        temp_min: 19,
+        temp_max: 21,
+        feels_like: 20,
+        humidity: 50,
+        pressure: 1013,
+      },
       weather: [{ description: 'clear sky', main: 'Clear', icon: '01d' }],
       wind: { speed: 2, deg: 90 },
       clouds: { all: 0 },
       coord: { lat, lon: Number(entry.lon) },
       timezone,
+      visibility: 10000,
     }
     const first = Math.floor(Date.now() / 10800000) * 10800000 + 10800000
     const payload = isForecast

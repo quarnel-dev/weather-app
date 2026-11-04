@@ -45,7 +45,7 @@ body {
 
   margin: auto;
 
-  height: 100dvh;
+  min-height: 100dvh;
   max-width: 1200px;
   width: 100%;
 

@@ -11,6 +11,7 @@ import type { Weather } from '@/types/Weather.type'
 import { WeatherServiceError } from '@/services/weather/weatherError'
 import { weatherFailure } from '@/services/weather/failure.server'
 import Recovery from '@/components/recovery/Recovery'
+import { WeatherDetails } from '@/components/weatherdetails/WeatherDetails'
 
 export async function WeatherCardServer({ city }: { city: City }) {
   let data: Weather
@@ -22,12 +23,15 @@ export async function WeatherCardServer({ city }: { city: City }) {
     return <Recovery {...weatherFailure(error)} />
   }
   return (
-    <WeatherCard weather={data} city={city}>
-      <WeatherBoundary message="Forecast could not be displayed. Try again.">
-        <Suspense fallback={<p role="status">Loading forecast...</p>}>
-          <ForecastTimelineServer city={city} weather={data} />
-        </Suspense>
-      </WeatherBoundary>
-    </WeatherCard>
+    <>
+      <WeatherCard weather={data} city={city}>
+        <WeatherBoundary message="Forecast could not be displayed. Try again.">
+          <Suspense fallback={<p role="status">Loading forecast...</p>}>
+            <ForecastTimelineServer city={city} weather={data} />
+          </Suspense>
+        </WeatherBoundary>
+      </WeatherCard>
+      <WeatherDetails weather={data} />
+    </>
   )
 }
