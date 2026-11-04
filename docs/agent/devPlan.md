@@ -49,12 +49,12 @@ The lead created PR #6 and merged the completed work. Its development workflow r
 
 Branch: `feat/weather-page`, based on the updated `main` at `12d3fd4`.
 
-The lead authorized task 1 implementation, with atomic commits and pushes during development. Work proceeds one task at a time, with the result shown before taking on the next task. The lead exclusively creates and manages the PR; do not edit its title, description, comments, or status.
+The lead authorized task 2 after reviewing task 1, with atomic commits and pushes during development. Work proceeds one task at a time, with the result shown before taking on the next task. The lead exclusively creates and manages the PR; do not edit its title, description, comments, or status.
 
 Agreed tasks:
 
-1. **Page data — implemented and validated locally, awaiting lead review.** Preserve pressure, visibility, and the city's UTC offset; retain the three-hour forecast points and group them by local date for daily temperature ranges.
-2. Build the current-weather card from the supplied screenshots: city, temperature, conditions, feels-like value, weather icon, and gradient background.
+1. **Page data — completed and accepted by the lead.** Preserve pressure, visibility, and the city's UTC offset; retain the three-hour forecast points and group them by local date for daily temperature ranges.
+2. **Current-weather card — in progress.** Build from the supplied screenshots: city, temperature, conditions, feels-like value, weather icon, and gradient background.
 3. Add the forecast timeline within that card, with horizontal scrolling on small screens.
 4. Add metric cards and sunrise/sunset using the appropriate units and city-local times.
 5. Add the daily forecast with conditions, icons, and temperature ranges.
@@ -77,3 +77,7 @@ Grouping preserves partial first/last days and all available dates; 40 three-hou
 Final local verification: formatting, lint, explicit TypeScript checking, all **307 Vitest tests in 19 files**, and the production build passed. An additional live check ran the actual request helper, parsers, and grouping function through the existing Vite loader against OpenWeather: Moscow returned valid new metrics, all 40 forecast points with UTC timestamps, and six local dates including partial days. Credentials and raw request URLs were not logged. Existing CI checks run on the pushed commits; no new browser tests, dependencies, UI, or README changes were added. Stop here for lead review before task 2, and leave PR management to the lead.
 
 CI follow-up: run `41875199394` reproduced the known hidden-streaming-duplicate selector failure in the mobile cache-reuse test (73 other checks passed). The remaining weather-text assertions in geolocation, navigation, and recovery now scope to the accessible main content, matching the lead's earlier fix. The cache scenario passed ten repeated desktop/mobile checks after the change; the isolated production build, affected ESLint checks, and typechecking also passed. This is a separate `fix(e2e)` increment, with no added browser scenarios or application changes.
+
+### Task 2 progress
+
+Use the supplied screenshots as the visual reference for the upper current-weather card. The search stays above it; the timeline remains task 3. New color tokens belong in `main.global.css`, as explicitly requested by the lead. The first increment adds the blue/navy/purple palette and eight weather masks plus a location pin using the existing SVG-mask mechanism. The eight weather states were visually inspected in Chromium; formatting and whitespace checks passed before committing. No icon dependency was added.
