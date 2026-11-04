@@ -49,13 +49,13 @@ The lead created PR #6 and merged the completed work. Its development workflow r
 
 Branch: `feat/weather-page`, based on the updated `main` at `12d3fd4`.
 
-The lead authorized task 2 after reviewing task 1, with atomic commits and pushes during development. Work proceeds one task at a time, with the result shown before taking on the next task. The lead exclusively creates and manages the PR; do not edit its title, description, comments, or status.
+The lead authorized task 3 after reviewing task 2, with atomic commits and pushes during development. Work proceeds one task at a time, with the result shown before taking on the next task. The lead exclusively creates and manages the PR; do not edit its title, description, comments, or status.
 
 Agreed tasks:
 
 1. **Page data — completed and accepted by the lead.** Preserve pressure, visibility, and the city's UTC offset; retain the three-hour forecast points and group them by local date for daily temperature ranges.
-2. **Current-weather card — implemented and validated, awaiting lead visual review.** Build from the supplied screenshots: city, temperature, conditions, feels-like value, weather icon, and gradient background.
-3. Add the forecast timeline within that card, with horizontal scrolling on small screens.
+2. **Current-weather card — completed and accepted by the lead.** Build from the supplied screenshots: city, temperature, conditions, feels-like value, weather icon, and gradient background.
+3. **Forecast timeline — in progress.** Add within that card, with horizontal scrolling on small screens.
 4. Add metric cards and sunrise/sunset using the appropriate units and city-local times.
 5. Add the daily forecast with conditions, icons, and temperature ranges.
 6. Review the complete responsive page, spacing, loading, and recovery states with the lead.
@@ -89,3 +89,7 @@ Before committing the card increment, all four server-component tests, 34 existi
 Task 2 final checks: formatting, lint, explicit TypeScript checking, **308 Vitest tests in 19 files**, the normal build, the isolated build, and all **74 existing browser checks** passed locally. The additional unit test covers selected-location identity; no browser scenarios or dependencies were added. A separate normal production process used the real OpenWeather binding and passed desktop/mobile rendering with zero page errors. Visual checks also covered a negative three-digit temperature and the home/404 pages at 320 px after the shared padding change. Live screenshots are outside the repository at `/workspace/artifacts/weather-card-desktop.png` and `/workspace/artifacts/weather-card-mobile.png`.
 
 The palette/icon increment (`b0571e3`) and the checked card increment (`ef6290f`) were committed and pushed during development. Stop after this task for lead review. Do not start the timeline or edit the PR.
+
+### Task 3 progress
+
+Pulled the lead's backdrop-filter fix `5d2a92a` before starting. The supplied reference is the current card with a separator and eight forecast positions. The timeline component shows Now plus the next seven future points in time order, formats city-local 24-hour times with the provider offset, and exposes each point's local date in a native time tooltip. Empty forecasts have a plain-text fallback. The list is horizontally scrollable and keyboard focusable. Its render receives a timestamp explicitly and does not read a clock itself. Four meaningful selection/time/empty-state tests passed in the default timezone and Pacific/Honolulu, along with affected ESLint checks and typechecking, before committing the first increment. Server loading and independent error recovery follow separately.

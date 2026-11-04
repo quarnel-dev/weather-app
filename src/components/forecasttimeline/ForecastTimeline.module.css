@@ -1,0 +1,40 @@
+.list {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding: 4px 0;
+  list-style: none;
+  scrollbar-width: thin;
+  scrollbar-color: var(--weather-border-color) transparent;
+}
+
+.list:focus-visible {
+  outline: 2px solid var(--accent-purple);
+  outline-offset: 4px;
+  border-radius: 8px;
+}
+
+.item {
+  display: flex;
+  flex: 1 0 72px;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.time {
+  color: var(--muted-color);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.icon {
+  width: 24px;
+  height: 24px;
+  color: var(--weather-icon-color);
+}
+
+.temperature {
+  font-size: 16px;
+  line-height: 1.5;
+}
