@@ -14,10 +14,13 @@ export const metadata: Metadata = {
 export default function NotFound() {
   return (
     <main className={s.container}>
-      <h1>City not found</h1>
-      <p>Search for another city or return to the home page.</p>
+      <i className={`i-location ${s.locationIcon}`} aria-hidden="true" />
+      <h1 className={s.title}>City not found</h1>
+      <p className={s.description}>Search for another city or return to the home page.</p>
       <Search />
-      <Link href="/">Go to home</Link>
+      <Link className={s.homeLink} href="/">
+        Go to home
+      </Link>
     </main>
   )
 }

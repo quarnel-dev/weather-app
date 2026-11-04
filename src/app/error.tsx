@@ -12,7 +12,7 @@ interface Props {
 export default function ErrorPage({ reset }: Props) {
   return (
     <main className={s.container}>
-      <h1>Something went wrong</h1>
+      <h1 className={s.title}>Something went wrong</h1>
       <Search />
       <Recovery compact message="This page is temporarily unavailable. Try again or search for another city." onRetry={reset} />
     </main>

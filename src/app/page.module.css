@@ -18,3 +18,43 @@
     min-height: calc(100dvh - 48px);
   }
 }
+
+.title {
+  font-size: 28px;
+  font-weight: 400;
+  line-height: 1.3;
+}
+
+.description {
+  max-width: 42ch;
+  color: var(--muted-color);
+  text-align: center;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.locationIcon {
+  width: 40px;
+  height: 40px;
+  color: var(--accent-purple);
+}
+
+.homeLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 10px 16px;
+  border: 1px solid var(--hover-border-color);
+  border-radius: 12px;
+  color: var(--accent-purple);
+  font-size: 14px;
+}
+
+.homeLink:hover {
+  border-color: var(--accent-purple);
+}
+
+.homeLink:focus-visible {
+  outline: 2px solid var(--accent-purple);
+  outline-offset: 3px;
+}
