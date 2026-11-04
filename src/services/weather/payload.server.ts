@@ -89,34 +89,33 @@ export function parseWeather(value: unknown): Weather {
 function forecastDate(value: unknown): string {
   const date = text(value)
   if (!/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(date)) throw new WeatherServiceError('invalid_response')
-  const timestamp = Date.parse(date.replace(' ', 'T') + 'Z')
+  const utc = date.replace(' ', 'T') + 'Z'
+  const timestamp = Date.parse(utc)
   if (!Number.isFinite(timestamp) || new Date(timestamp).toISOString().slice(0, 19).replace('T', ' ') !== date) {
     throw new WeatherServiceError('invalid_response')
   }
-  return date
+  return utc
 }
 
 export function parseForecast(value: unknown): Forecast[] {
   const data = envelope(value)
   if (!Array.isArray(data.list)) throw new WeatherServiceError('invalid_response')
 
-  return data.list
-    .map((value): Forecast => {
-      const item = record(value)
-      const main = record(item.main)
-      const wind = record(item.wind)
-      const condition = conditions(item.weather)
+  return data.list.map((value): Forecast => {
+    const item = record(value)
+    const main = record(item.main)
+    const wind = record(item.wind)
+    const condition = conditions(item.weather)
 
-      return {
-        date: forecastDate(item.dt_txt),
-        temp: Math.round(number(main.temp)),
-        tempMin: Math.round(number(main.temp_min)),
-        tempMax: Math.round(number(main.temp_max)),
-        description: text(condition.description),
-        icon: icon(condition.icon),
-        humidity: number(main.humidity, 0, 100),
-        windSpeed: number(wind.speed, 0),
-      }
-    })
-    .filter((item) => item.date.endsWith(' 12:00:00'))
+    return {
+      date: forecastDate(item.dt_txt),
+      temp: Math.round(number(main.temp)),
+      tempMin: Math.round(number(main.temp_min)),
+      tempMax: Math.round(number(main.temp_max)),
+      description: text(condition.description),
+      icon: icon(condition.icon),
+      humidity: number(main.humidity, 0, 100),
+      windSpeed: number(wind.speed, 0),
+    }
+  })
 }

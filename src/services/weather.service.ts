@@ -15,7 +15,7 @@ const loadWeather = unstable_cache(
 
 const loadForecast = unstable_cache(
   async (lat: string, lon: string) => parseForecast(await requestWeather('forecast', { lat, lon })),
-  ['weather-forecast-v1'],
+  ['weather-forecast-v2'],
   { revalidate: 600 }
 )
 

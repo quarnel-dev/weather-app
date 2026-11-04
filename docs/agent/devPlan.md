@@ -65,3 +65,5 @@ Use the existing OpenWeather access: five-day forecasts at three-hour intervals.
 This project targets one release. Keep functions and components readable and relatively small, avoid speculative abstractions and new infrastructure, and add tests only for meaningful changed logic or confirmed regressions. Preserve incremental, subject-only commits with Codex as author and committer. README remains reserved for joint work with the lead at the end.
 
 Task 1 progress: current weather now preserves pressure in hPa, visibility in metres, and the signed UTC offset in seconds. Missing values stay null, present values are validated, and the current-weather cache namespace is v2. Relevant parser/service/component tests (96), lint, and explicit typechecking passed before committing this increment. Forecast preparation follows separately.
+
+The forecast parser now retains every point and returns explicit UTC ISO timestamps, preserving provider order and existing payload validation. Its cache namespace is v2. The affected parser/service checks (93), ESLint, and explicit typechecking passed before committing this increment. Daily grouping follows separately.

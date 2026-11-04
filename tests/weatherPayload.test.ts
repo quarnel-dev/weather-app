@@ -143,10 +143,20 @@ describe('current weather payload', () => {
 })
 
 describe('forecast payload', () => {
-  test('returns the existing noon UTC samples in provider order', () => {
+  test('preserves every forecast point in provider order with explicit UTC dates', () => {
     expect(parseForecast(forecastPayload())).toEqual([
       {
-        date: '2026-10-21 12:00:00',
+        date: '2026-10-21T09:00:00Z',
+        temp: 18,
+        tempMin: 17,
+        tempMax: 19,
+        description: 'light rain',
+        icon: 'rain',
+        humidity: 60,
+        windSpeed: 3,
+      },
+      {
+        date: '2026-10-21T12:00:00Z',
         temp: 20,
         tempMin: 19,
         tempMax: 21,
@@ -156,7 +166,7 @@ describe('forecast payload', () => {
         windSpeed: 3,
       },
       {
-        date: '2026-10-22 12:00:00',
+        date: '2026-10-22T12:00:00Z',
         temp: 20,
         tempMin: 19,
         tempMax: 21,
@@ -195,7 +205,7 @@ describe('forecast payload', () => {
     ['list.1.weather', []],
     ['list.1.weather.0.icon', {}],
     ['list.0.main.temp', null],
-  ])('validates all forecast entries, including unselected hours: %s', (path, value) => {
+  ])('validates every forecast entry: %s', (path, value) => {
     expect(() => parseForecast(change(forecastPayload(), path, value))).toThrow(WeatherServiceError)
   })
 })
