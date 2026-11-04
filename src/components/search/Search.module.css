@@ -209,3 +209,11 @@
     margin-left: 32px;
   }
 }
+
+ul.dropdown {
+  max-height: min(420px, max(100px, calc(50dvh - 60px)));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--weather-border-color) transparent;
+}
