@@ -19,6 +19,8 @@ const modes = new Set([
   'body',
   'unexpected',
   'missing-key',
+  'forecast-empty',
+  'missing-details',
   'forecast-valid',
   'forecast-http-503',
   'forecast-headers',
@@ -168,12 +170,19 @@ globalThis.fetch = async function (input, options) {
       timezone,
       visibility: 10000,
     }
+    if (mode === 'missing-details') {
+      current.timezone = null
+      current.main.pressure = null
+      current.visibility = null
+      current.sys.sunrise = null
+      current.sys.sunset = null
+    }
     const first = Math.floor(Date.now() / 10800000) * 10800000 + 10800000
     const payload = isForecast
       ? {
           cod: '200',
           city: { timezone },
-          list: Array.from({ length: 40 }, (_, index) => {
+          list: Array.from({ length: mode === 'empty' ? 0 : 40 }, (_, index) => {
             const timestamp = first + index * 10800000
             const hour = new Date(timestamp + timezone * 1000).getUTCHours()
             return {

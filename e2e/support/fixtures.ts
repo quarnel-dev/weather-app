@@ -13,12 +13,14 @@ type Mode =
   | 'body'
   | 'unexpected'
   | 'missing-key'
+  | 'forecast-empty'
+  | 'missing-details'
   | 'forecast-valid'
   | 'forecast-http-503'
   | 'forecast-headers'
   | 'forecast-unexpected'
 interface ProviderState {
-  requests: { endpoint: string; lat: string; lon: string; mode: Mode; aborted: boolean; completed: boolean }[]
+  requests: { endpoint: string; lat: string; lon: string; mode: Mode | 'empty'; aborted: boolean; completed: boolean }[]
 }
 interface Provider {
   mode: (mode: Mode, delayMs?: number) => Promise<void>

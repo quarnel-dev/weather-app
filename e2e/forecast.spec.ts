@@ -123,3 +123,27 @@ test('keeps weather and metric positions stable through both loading stages', as
   expect(Math.abs(metricsAfter!.y - metricsBefore!.y)).toBeLessThan(2)
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
 })
+
+test('shows explicit empty forecast states while preserving current weather and search', async ({ page, provider }) => {
+  await provider.mode('forecast-empty')
+  await page.goto('/ru/moscow')
+  const main = page.getByRole('main')
+  await expect(main.getByText('20°C', { exact: true })).toBeVisible()
+  await expect(main.getByRole('status').filter({ hasText: 'No upcoming forecast is available.' })).toBeVisible()
+  await expect(main.getByRole('status').filter({ hasText: 'No daily forecast is available.' })).toBeVisible()
+  await expect(page.getByRole('combobox')).toBeEnabled()
+  await expect(main.getByRole('alert')).toHaveCount(0)
+})
+
+test('does not invent missing metrics or request forecasts without the city offset', async ({ page, provider }) => {
+  await provider.mode('missing-details')
+  await page.goto('/ru/moscow')
+  const main = page.getByRole('main')
+  await expect(main.getByText('20°C', { exact: true })).toBeVisible()
+  for (const name of ['Pressure', 'Visibility', 'Sunrise', 'Sunset']) {
+    await expect(page.getByRole('region', { name, exact: true }).getByText('—')).toBeVisible()
+  }
+  await expect(main.getByRole('status').filter({ hasText: 'Forecast times are unavailable for this location.' })).toBeVisible()
+  await expect(main.getByRole('status').filter({ hasText: 'Forecast dates are unavailable for this location.' })).toBeVisible()
+  expect((await provider.state()).requests.map((request) => request.endpoint)).toEqual(['/data/2.5/weather'])
+})
