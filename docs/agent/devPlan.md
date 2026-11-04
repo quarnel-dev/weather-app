@@ -56,7 +56,7 @@ Agreed tasks:
 1. **Page data — completed and accepted by the lead.** Preserve pressure, visibility, and the city's UTC offset; retain the three-hour forecast points and group them by local date for daily temperature ranges.
 2. **Current-weather card — completed and accepted by the lead.** Build from the supplied screenshots: city, temperature, conditions, feels-like value, weather icon, and gradient background.
 3. **Forecast timeline — completed and accepted by the lead.** Add within that card, with horizontal scrolling on small screens.
-4. **Weather details — implementation in progress.** Add metric cards and sunrise/sunset using the appropriate units and city-local times.
+4. **Weather details — implemented and validated, awaiting lead review.** Add metric cards and sunrise/sunset using the appropriate units and city-local times.
 5. Add the daily forecast with conditions, icons, and temperature ranges.
 6. Review the complete responsive page, spacing, loading, and recovery states with the lead.
 
@@ -111,3 +111,7 @@ The lead authorized the metric and solar cards: four metric columns on desktop, 
 A server-rendered WeatherDetails component reuses the already-fetched current weather. Wind is rounded to km/h; visibility is converted from metres to kilometres with one decimal when needed. Pressure stays in hPa and humidity in percent. Solar times use the city offset, with UTC datetimes and local-date tooltips; unavailable measurements, events, or timezone metadata show an em dash. No new request or dependency is introduced. Three focused component tests cover conversions, fractional offsets across midnight, zero values, and missing data; they also passed under Pacific/Honolulu.
 
 The growing page now uses a minimum body height rather than a fixed viewport height. Home/404 containers retain viewport centering. Desktop, 390 px, and 320 px screenshots were inspected; home and 404 checks at 320 px confirmed centering and no horizontal overflow. The private browser provider now supplies pressure and visibility, without adding browser scenarios. Focused component/server checks, lint, typechecking, and the isolated production build passed before committing this increment. Full verification follows.
+
+Task 4 final checks: formatting, lint, explicit TypeScript checking, **320 Vitest tests in 22 files**, the normal production build, the isolated production build, and all **80 existing production browser checks** passed locally. Three component tests were added; browser scenarios and their assertions were preserved. The implementation was committed and pushed as `c07163e` after focused checks, before this full validation.
+
+A normal production server using real OpenWeather data rendered all six detail cards on desktop and mobile without page errors or horizontal overflow. With the browser timezone set to Los Angeles, both solar labels matched their UTC datetimes shifted to Moscow's UTC+3. Home and 404 layouts were checked again at 320 px after their entrance animations finished. Live screenshots are outside the repository at `/workspace/artifacts/weather-details-desktop.png` and `/workspace/artifacts/weather-details-mobile.png`. No dependencies or README changes were added. Stop before task 5 for lead review; the PR remains exclusively managed by the lead.
