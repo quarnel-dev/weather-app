@@ -11,6 +11,8 @@ import type { Weather } from '@/types/Weather.type'
 import { WeatherServiceError } from '@/services/weather/weatherError'
 import { weatherFailure } from '@/services/weather/failure.server'
 import Recovery from '@/components/recovery/Recovery'
+import { DailyForecastServer } from '@/components/dailyforecast/DailyForecast.server'
+import dailyStyles from '@/components/dailyforecast/DailyForecast.module.css'
 import { WeatherDetails } from '@/components/weatherdetails/WeatherDetails'
 
 export async function WeatherCardServer({ city }: { city: City }) {
@@ -32,6 +34,14 @@ export async function WeatherCardServer({ city }: { city: City }) {
         </WeatherBoundary>
       </WeatherCard>
       <WeatherDetails weather={data} />
+      <section className={dailyStyles.container} aria-label="Daily forecast">
+        <h2 className={dailyStyles.heading}>Daily Forecast</h2>
+        <WeatherBoundary message="Daily forecast could not be displayed. Try again.">
+          <Suspense fallback={<p role="status">Loading daily forecast...</p>}>
+            <DailyForecastServer city={city} weather={data} />
+          </Suspense>
+        </WeatherBoundary>
+      </section>
     </>
   )
 }

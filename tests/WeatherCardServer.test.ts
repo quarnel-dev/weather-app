@@ -9,6 +9,7 @@ import type { City } from '@/types/City.type'
 const { getWeather, forecastTimeline } = vi.hoisted(() => ({ getWeather: vi.fn(), forecastTimeline: vi.fn() }))
 vi.mock('@/services/weather.service', () => ({ getWeather }))
 vi.mock('@/components/forecasttimeline/ForecastTimeline.server', () => ({ ForecastTimelineServer: forecastTimeline }))
+vi.mock('@/components/dailyforecast/DailyForecast.server', () => ({ DailyForecastServer: () => null }))
 const city: City = { id: 1886760, name: 'Suzhou', country: 'CN', admin1: 'Jiangsu', lat: '31.30408', lon: '120.59538', pop: '1' }
 
 beforeEach(() => {

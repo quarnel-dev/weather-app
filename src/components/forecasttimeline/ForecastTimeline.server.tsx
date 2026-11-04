@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { getForecast } from '@/services/weather.service'
+import { readForecast } from '@/services/weather/forecast.server'
 import { WeatherServiceError } from '@/services/weather/weatherError'
 import { weatherFailure } from '@/services/weather/failure.server'
 import Recovery from '@/components/recovery/Recovery'
@@ -8,11 +8,6 @@ import type { City } from '@/types/City.type'
 import type { Weather } from '@/types/Weather.type'
 import type { Forecast } from '@/types/Forecast.type'
 import { ForecastTimeline } from './ForecastTimeline'
-
-async function readForecast(city: City) {
-  const forecast = await getForecast(city)
-  return { forecast, now: Date.now() }
-}
 
 export async function ForecastTimelineServer({ city, weather }: { city: City; weather: Weather }) {
   const timezoneOffset = weather.timezoneOffset
