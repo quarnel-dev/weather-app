@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { Suspense } from 'react'
+import { ForecastTimelineSkeleton, DailyForecastSkeleton } from '@/components/weatherskeleton/WeatherSkeleton'
 import { WeatherCard } from './WeatherCard'
 import WeatherBoundary from './WeatherBoundary'
 import { ForecastTimelineServer } from '@/components/forecasttimeline/ForecastTimeline.server'
@@ -28,7 +29,7 @@ export async function WeatherCardServer({ city }: { city: City }) {
     <>
       <WeatherCard weather={data} city={city}>
         <WeatherBoundary message="Forecast could not be displayed. Try again.">
-          <Suspense fallback={<p role="status">Loading forecast...</p>}>
+          <Suspense fallback={<ForecastTimelineSkeleton />}>
             <ForecastTimelineServer city={city} weather={data} />
           </Suspense>
         </WeatherBoundary>
@@ -37,7 +38,7 @@ export async function WeatherCardServer({ city }: { city: City }) {
       <section className={dailyStyles.container} aria-label="Daily forecast">
         <h2 className={dailyStyles.heading}>Daily Forecast</h2>
         <WeatherBoundary message="Daily forecast could not be displayed. Try again.">
-          <Suspense fallback={<p role="status">Loading daily forecast...</p>}>
+          <Suspense fallback={<DailyForecastSkeleton />}>
             <DailyForecastServer city={city} weather={data} />
           </Suspense>
         </WeatherBoundary>

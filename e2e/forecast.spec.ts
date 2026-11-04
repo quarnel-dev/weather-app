@@ -77,3 +77,48 @@ test('contains unexpected forecast errors inside the timeline and recovers', asy
   await expect(daily.getByRole('list')).toBeVisible()
   expect(await page.evaluate(() => document.documentElement.dataset.forecastSession)).toBe('preserved')
 })
+
+test('keeps weather and metric positions stable through both loading stages', async ({ page, provider }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  await provider.mode('valid', 2000)
+  await page.goto('/ru/moscow', { waitUntil: 'commit' })
+  const loading = page.getByRole('status', { name: 'Loading weather...', exact: true })
+  await expect(loading).toBeVisible()
+  await expect(loading.locator('section[aria-label="Current weather"]')).toBeVisible()
+  await expect(loading.locator('section[aria-label="Weather details"]')).toBeVisible()
+  await page.evaluate(() => document.fonts.ready)
+  const geometry = await page.waitForFunction(() => {
+    const root = document.querySelector('[role="status"][aria-label="Loading weather..."]')
+    const hero = root?.querySelector('section[aria-label="Current weather"]')?.getBoundingClientRect()
+    const metrics = root?.querySelector('section[aria-label="Weather details"]')?.getBoundingClientRect()
+    return hero?.height && metrics?.height
+      ? { hero: { height: hero.height }, metrics: { y: metrics.y, height: metrics.height } }
+      : null
+  })
+  const initial = await geometry.jsonValue()
+  if (!initial) throw new Error('Loading layout was not measured')
+  const { hero: heroBefore, metrics: metricsBefore } = initial
+  expect(
+    await loading
+      .locator('span[style]')
+      .first()
+      .evaluate((element) => getComputedStyle(element).animationName)
+  ).toBe('none')
+  await expect(page.getByRole('combobox')).toBeEnabled()
+  const hero = page.getByRole('region', { name: 'Current weather', exact: true })
+  await expect(hero).toBeVisible()
+  await expect(loading).toHaveCount(0)
+  const metrics = page.getByRole('region', { name: 'Weather details', exact: true })
+  const heroDuring = await hero.boundingBox()
+  const metricsDuring = await metrics.boundingBox()
+  expect(Math.abs(heroDuring!.height - heroBefore!.height)).toBeLessThan(2)
+  expect(Math.abs(metricsDuring!.y - metricsBefore!.y)).toBeLessThan(2)
+  expect(Math.abs(metricsDuring!.height - metricsBefore!.height)).toBeLessThan(2)
+  await expect(hero.getByRole('listitem')).toHaveCount(8)
+  await expect(page.getByRole('region', { name: 'Daily forecast', exact: true }).getByRole('list')).toBeVisible()
+  const heroAfter = await hero.boundingBox()
+  const metricsAfter = await metrics.boundingBox()
+  expect(Math.abs(heroAfter!.height - heroBefore!.height)).toBeLessThan(2)
+  expect(Math.abs(metricsAfter!.y - metricsBefore!.y)).toBeLessThan(2)
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
+})
