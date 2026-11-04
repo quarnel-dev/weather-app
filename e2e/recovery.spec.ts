@@ -13,7 +13,7 @@ test('keeps search state while retrying a failed weather request', async ({ page
   await page.getByRole('button', { name: 'Try again' }).click()
   await expect(page.getByRole('button', { name: 'Retrying...' })).toBeDisabled()
   await expect(input).toHaveValue('Suzhou')
-  await expect(page.getByText('20°C', { exact: true })).toBeVisible()
+  await expect(page.getByRole('main').getByText('20°C', { exact: true })).toBeVisible()
   await expect(page.getByRole('main').getByRole('alert')).toHaveCount(0)
   await expect(input).toHaveValue('Suzhou')
 })
@@ -27,7 +27,7 @@ test('can search for a city from a real 404 response', async ({ page }) => {
   await expect(page.getByRole('listbox')).toBeVisible()
   await input.press('Enter')
   await expect(page).toHaveURL('/ru/moscow')
-  await expect(page.getByText('20°C', { exact: true })).toBeVisible()
+  await expect(page.getByRole('main').getByText('20°C', { exact: true })).toBeVisible()
 })
 
 for (const [mode, message] of [
@@ -44,7 +44,7 @@ for (const [mode, message] of [
     })
     await provider.mode('valid', 300)
     await page.getByRole('button', { name: 'Try again' }).click()
-    await expect(page.getByText('20°C', { exact: true })).toBeVisible()
+    await expect(page.getByRole('main').getByText('20°C', { exact: true })).toBeVisible()
     expect(await page.evaluate(() => document.documentElement.dataset.sessionMarker)).toBe('preserved')
   })
 }
@@ -57,7 +57,7 @@ for (const mode of ['headers', 'body'] as const) {
     expect((await provider.state()).requests.some((request) => request.aborted)).toBe(true)
     await provider.mode('valid')
     await page.getByRole('button', { name: 'Try again' }).click()
-    await expect(page.getByText('20°C', { exact: true })).toBeVisible()
+    await expect(page.getByRole('main').getByText('20°C', { exact: true })).toBeVisible()
     await expect(page.getByRole('combobox')).toBeVisible()
   })
 }
@@ -101,7 +101,7 @@ test('contains an unexpected weather exception and recovers inside the weather b
   await input.press('Tab')
   await provider.mode('valid', 300)
   await page.getByRole('button', { name: 'Try again' }).click()
-  await expect(page.getByText('20°C', { exact: true })).toBeVisible()
+  await expect(page.getByRole('main').getByText('20°C', { exact: true })).toBeVisible()
   await expect(input).toHaveValue('Suzhou')
 })
 
@@ -116,19 +116,19 @@ test('allows another failed attempt before a successful retry', async ({ page, p
   await expect(button).toBeEnabled()
   await provider.mode('valid', 500)
   await button.click()
-  await expect(page.getByText('20°C', { exact: true })).toBeVisible()
+  await expect(page.getByRole('main').getByText('20°C', { exact: true })).toBeVisible()
 })
 
 test('reuses validated weather after the provider becomes unavailable', async ({ page, provider }) => {
   await page.goto('/ru/moscow')
-  await expect(page.getByText('20°C', { exact: true })).toBeVisible()
+  await expect(page.getByRole('main').getByText('20°C', { exact: true })).toBeVisible()
   await expect
     .poll(async () => (await page.context().cookies()).find((cookie) => cookie.name === 'lastCity')?.value)
     .toBe('524901')
   const initial = (await provider.state()).requests.length
   await provider.mode('http-503')
   await page.reload()
-  await expect(page.getByText('20°C', { exact: true })).toBeVisible()
+  await expect(page.getByRole('main').getByText('20°C', { exact: true })).toBeVisible()
   expect((await provider.state()).requests).toHaveLength(initial)
 })
 

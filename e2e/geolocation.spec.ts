@@ -10,7 +10,7 @@ for (const city of [
     await context.setGeolocation(city)
     await page.goto('/')
     await expect(page).toHaveURL(`/cn/suzhou-${city.id}`)
-    await expect(page.getByText(city.name, { exact: true })).toBeVisible()
+    await expect(page.getByRole('main').getByText(city.name, { exact: true })).toBeVisible()
     await rememberedCity(context, city.id)
     const requests = (await provider.state()).requests
     expect(requests.length).toBeGreaterThan(0)
@@ -28,7 +28,7 @@ test('falls back to manual search after permission denial', async ({ page, conte
   await expect(page.getByRole('listbox')).toBeVisible()
   await input.press('Enter')
   await expect(page).toHaveURL('/ru/moscow')
-  await expect(page.getByText('20°C', { exact: true })).toBeVisible()
+  await expect(page.getByRole('main').getByText('20°C', { exact: true })).toBeVisible()
   await rememberedCity(context, 524901)
 })
 
@@ -96,7 +96,7 @@ test('ignores a stalled location action after manual navigation', async ({ page,
     await expect(page.getByRole('listbox')).toBeVisible()
     await input.press('Enter')
     await expect(page).toHaveURL('/ru/moscow')
-    await expect(page.getByText('20°C', { exact: true })).toBeVisible()
+    await expect(page.getByRole('main').getByText('20°C', { exact: true })).toBeVisible()
     release()
     await rememberedCity(context, 524901)
     await expect(page).toHaveURL('/ru/moscow')
