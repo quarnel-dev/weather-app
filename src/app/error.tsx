@@ -14,7 +14,7 @@ export default function ErrorPage({ reset }: Props) {
     <main className={s.container}>
       <h1>Something went wrong</h1>
       <Search />
-      <Recovery message="This page is temporarily unavailable. Try again or search for another city." onRetry={reset} />
+      <Recovery compact message="This page is temporarily unavailable. Try again or search for another city." onRetry={reset} />
     </main>
   )
 }

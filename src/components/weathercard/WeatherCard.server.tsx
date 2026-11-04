@@ -28,7 +28,7 @@ export async function WeatherCardServer({ city }: { city: City }) {
   return (
     <>
       <WeatherCard weather={data} city={city}>
-        <WeatherBoundary message="Forecast could not be displayed. Try again.">
+        <WeatherBoundary compact message="Forecast could not be displayed. Try again.">
           <Suspense fallback={<ForecastTimelineSkeleton />}>
             <ForecastTimelineServer city={city} weather={data} />
           </Suspense>
@@ -37,7 +37,7 @@ export async function WeatherCardServer({ city }: { city: City }) {
       <WeatherDetails weather={data} />
       <section className={dailyStyles.container} aria-label="Daily forecast">
         <h2 className={dailyStyles.heading}>Daily Forecast</h2>
-        <WeatherBoundary message="Daily forecast could not be displayed. Try again.">
+        <WeatherBoundary compact message="Daily forecast could not be displayed. Try again.">
           <Suspense fallback={<DailyForecastSkeleton />}>
             <DailyForecastServer city={city} weather={data} />
           </Suspense>

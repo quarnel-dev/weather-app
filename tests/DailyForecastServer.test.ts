@@ -35,7 +35,7 @@ test.each([
   vi.spyOn(console, 'error').mockImplementation(() => {})
   getForecast.mockRejectedValue(new WeatherServiceError('http', status))
   const result = await DailyForecastServer({ city, weather })
-  expect(result.props).toEqual({ message: 'Daily forecast is temporarily unavailable.', retryable })
+  expect(result.props).toEqual({ compact: true, message: 'Daily forecast is temporarily unavailable.', retryable })
 })
 
 test('passes unexpected failures to the daily block boundary', async () => {

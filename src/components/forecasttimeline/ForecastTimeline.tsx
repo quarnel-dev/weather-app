@@ -1,3 +1,4 @@
+import feedback from '@/components/recovery/Recovery.module.css'
 import skeleton from '@/components/weatherskeleton/WeatherSkeleton.module.css'
 import type { Forecast } from '@/types/Forecast.type'
 import type { Weather } from '@/types/Weather.type'
@@ -16,7 +17,12 @@ export function ForecastTimeline({ forecast, weather, timezoneOffset, now }: Pro
     .sort((first, second) => Date.parse(first.date) - Date.parse(second.date))
     .slice(0, 7)
 
-  if (upcoming.length === 0) return <p>No upcoming forecast is available.</p>
+  if (upcoming.length === 0)
+    return (
+      <p className={feedback.empty} role="status">
+        No upcoming forecast is available.
+      </p>
+    )
 
   return (
     <ul className={`${s.list} ${skeleton.reveal}`} tabIndex={0} aria-label="Forecast timeline">

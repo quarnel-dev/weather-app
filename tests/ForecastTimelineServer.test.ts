@@ -37,7 +37,7 @@ test.each([
   const log = vi.spyOn(console, 'error').mockImplementation(() => {})
   getForecast.mockRejectedValue(new WeatherServiceError('http', status))
   const result = await ForecastTimelineServer({ city, weather })
-  expect(result.props).toEqual({ message: 'Forecast is temporarily unavailable.', retryable })
+  expect(result.props).toEqual({ compact: true, message: 'Forecast is temporarily unavailable.', retryable })
   expect(log).toHaveBeenCalledWith('Forecast request failed', { code: 'http', status })
 })
 

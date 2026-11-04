@@ -1,10 +1,16 @@
+import feedback from '@/components/recovery/Recovery.module.css'
 import skeleton from '@/components/weatherskeleton/WeatherSkeleton.module.css'
 import type { CSSProperties } from 'react'
 import type { DailyForecast as Day } from '@/types/DailyForecast.type'
 import s from './DailyForecast.module.css'
 
 export function DailyForecast({ days, today }: { days: Day[]; today: string }) {
-  if (days.length === 0) return <p>No daily forecast is available.</p>
+  if (days.length === 0)
+    return (
+      <p className={feedback.empty} role="status">
+        No daily forecast is available.
+      </p>
+    )
 
   const minimum = Math.min(...days.map((day) => day.tempMin))
   const maximum = Math.max(...days.map((day) => day.tempMax))
