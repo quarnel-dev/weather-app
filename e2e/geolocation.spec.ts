@@ -129,3 +129,14 @@ test('lets manual search bypass geolocation and ignores a late successful positi
   await input.press('Enter')
   await expect(page).toHaveURL('/ru/moscow')
 })
+
+test('respects reduced motion before the homepage client scripts load', async ({ page, provider }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  await page.route('**/_next/**/*.js', (route) => route.abort())
+  await page.goto('/')
+  await expect(page.getByRole('status')).toHaveText('Detecting your location...')
+  await expect(page.locator('main .i-spinner')).toHaveCSS('display', 'none')
+  await expect(page.locator('main .i-location')).toBeVisible()
+  await expect(page.getByRole('status').locator('..')).toHaveCSS('animation-name', 'none')
+  expect((await provider.state()).requests).toEqual([])
+})

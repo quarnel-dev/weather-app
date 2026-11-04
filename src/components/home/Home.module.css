@@ -63,3 +63,20 @@
   outline: 2px solid var(--accent-purple);
   outline-offset: 3px;
 }
+
+.spinner {
+  display: inline-block;
+}
+
+.staticIcon {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    display: none;
+  }
+  .staticIcon {
+    display: inline-block;
+  }
+}

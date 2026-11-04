@@ -1,4 +1,3 @@
-import type { ReactNode } from 'react'
 import { StrictMode } from 'react'
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, expect, test, vi } from 'vitest'
@@ -14,11 +13,6 @@ vi.mock('next/navigation', () => ({ useRouter: () => router }))
 vi.mock('@/services/geo/getGeo.service', () => ({ getGeoClient }))
 vi.mock('@/services/geo/resolveLocation.action', () => ({ resolveLocation }))
 vi.mock('@/components/search/Search', () => ({ default: () => <input aria-label="Search cities" /> }))
-vi.mock('motion/react', () => ({
-  useReducedMotion: () => true,
-  AnimatePresence: ({ children }: { children: ReactNode }) => <>{children}</>,
-  motion: { div: ({ children }: { children: ReactNode }) => <div>{children}</div> },
-}))
 
 function deferred<T>() {
   let resolve!: (value: T) => void
