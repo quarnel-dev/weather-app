@@ -53,7 +53,7 @@ The lead authorized task 1 implementation, with atomic commits and pushes during
 
 Agreed tasks:
 
-1. Prepare page data: preserve pressure, visibility, and the city's UTC offset; retain the three-hour forecast points and group them by local date for daily temperature ranges.
+1. **Page data — implemented and validated locally, awaiting lead review.** Preserve pressure, visibility, and the city's UTC offset; retain the three-hour forecast points and group them by local date for daily temperature ranges.
 2. Build the current-weather card from the supplied screenshots: city, temperature, conditions, feels-like value, weather icon, and gradient background.
 3. Add the forecast timeline within that card, with horizontal scrolling on small screens.
 4. Add metric cards and sunrise/sunset using the appropriate units and city-local times.
@@ -64,6 +64,14 @@ Use the existing OpenWeather access: five-day forecasts at three-hour intervals.
 
 This project targets one release. Keep functions and components readable and relatively small, avoid speculative abstractions and new infrastructure, and add tests only for meaningful changed logic or confirmed regressions. Preserve incremental, subject-only commits with Codex as author and committer. README remains reserved for joint work with the lead at the end.
 
-Task 1 progress: current weather now preserves pressure in hPa, visibility in metres, and the signed UTC offset in seconds. Missing values stay null, present values are validated, and the current-weather cache namespace is v2. Relevant parser/service/component tests (96), lint, and explicit typechecking passed before committing this increment. Forecast preparation follows separately.
+### Task 1 delivery
 
-The forecast parser now retains every point and returns explicit UTC ISO timestamps, preserving provider order and existing payload validation. Its cache namespace is v2. The affected parser/service checks (93), ESLint, and explicit typechecking passed before committing this increment. Daily grouping follows separately.
+Three checked increments were committed and pushed during implementation:
+
+- `944d3f1`: current weather preserves pressure in hPa, visibility in metres, and the signed UTC offset in seconds. Missing values stay null; malformed present values fail existing payload validation. Relevant parser/service/component tests (96), lint, and explicit typechecking passed before this commit.
+- `73da7bf`: the forecast parser retains every point in provider order and returns explicit UTC ISO dates, for example `2026-11-04T18:00:00Z`. Parser/service tests (93), ESLint, and explicit typechecking passed before this commit. Both changed cache namespaces are v2, preventing old cached objects and noon-only arrays from being reused.
+- `a3dee79`: `groupForecastByDay` groups validated points by local calendar date, returns sorted daily temperature ranges, and selects conditions from the point closest to local noon. Equal-distance ties use the earlier point. Seven focused tests passed in both the default process timezone and `Pacific/Honolulu`, along with ESLint and typechecking, before this commit.
+
+Grouping preserves partial first/last days and all available dates; 40 three-hour points can span six local dates. It does not pad days or decide the eventual UI row count. Missing timezone metadata yields no daily summaries while leaving the original points available. The provider's fixed UTC offset is used; it does not supply the IANA timezone rules needed to infer offset changes during future daylight-saving transitions.
+
+Final local verification: formatting, lint, explicit TypeScript checking, all **307 Vitest tests in 19 files**, and the production build passed. An additional live check ran the actual request helper, parsers, and grouping function through the existing Vite loader against OpenWeather: Moscow returned valid new metrics, all 40 forecast points with UTC timestamps, and six local dates including partial days. Credentials and raw request URLs were not logged. Existing CI checks run on the pushed commits; no new browser tests, dependencies, UI, or README changes were added. Stop here for lead review before task 2, and leave PR management to the lead.
