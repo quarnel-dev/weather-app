@@ -1,22 +1,23 @@
 import type { Weather } from '@/types/Weather.type'
 import s from './WeatherDetails.module.css'
+import { SkeletonValue } from '@/components/weatherskeleton/SkeletonValue'
 
-export function WeatherDetails({ weather }: { weather: Weather }) {
+export function WeatherDetails({ weather }: { weather?: Weather }) {
   const metrics = [
-    { name: 'Wind', icon: 'wind', value: Math.round(weather.windSpeed * 3.6), unit: 'km/h', color: 'blue' },
-    { name: 'Humidity', icon: 'humidity', value: weather.humidity, unit: '%', color: 'cyan' },
-    { name: 'Pressure', icon: 'pressure', value: weather.pressure, unit: 'hPa', color: 'violet' },
+    { name: 'Wind', icon: 'wind', value: weather ? Math.round(weather.windSpeed * 3.6) : null, unit: 'km/h', color: 'blue' },
+    { name: 'Humidity', icon: 'humidity', value: weather?.humidity, unit: '%', color: 'cyan' },
+    { name: 'Pressure', icon: 'pressure', value: weather?.pressure, unit: 'hPa', color: 'violet' },
     {
       name: 'Visibility',
       icon: 'visibility',
-      value: weather.visibility === null ? null : Number((weather.visibility / 1000).toFixed(1)),
+      value: weather?.visibility == null ? null : Number((weather.visibility / 1000).toFixed(1)),
       unit: 'km',
       color: 'indigo',
     },
   ]
   const solar = [
-    { name: 'Sunrise', icon: 'sunrise', timestamp: weather.sunrise },
-    { name: 'Sunset', icon: 'sunset', timestamp: weather.sunset },
+    { name: 'Sunrise', icon: 'sunrise', timestamp: weather?.sunrise },
+    { name: 'Sunset', icon: 'sunset', timestamp: weather?.sunset },
   ]
 
   return (
@@ -28,7 +29,7 @@ export function WeatherDetails({ weather }: { weather: Weather }) {
               <i className={`i-${metric.icon}`} aria-hidden="true" />
               {metric.name}
             </h2>
-            <p className={s.value}>{metric.value ?? '—'}</p>
+            <p className={s.value}>{weather ? (metric.value ?? '—') : <SkeletonValue width="3ch" />}</p>
             <p className={s.unit}>{metric.unit}</p>
           </section>
         ))}
@@ -36,7 +37,7 @@ export function WeatherDetails({ weather }: { weather: Weather }) {
       <div className={s.solar}>
         {solar.map((event) => {
           const local =
-            event.timestamp === null || weather.timezoneOffset === null
+            event.timestamp == null || weather?.timezoneOffset == null
               ? null
               : new Date((event.timestamp + weather.timezoneOffset) * 1000).toISOString()
           return (
@@ -46,7 +47,9 @@ export function WeatherDetails({ weather }: { weather: Weather }) {
                 {event.name}
               </h2>
               <p className={s.value}>
-                {local ? (
+                {!weather ? (
+                  <SkeletonValue />
+                ) : local ? (
                   <time dateTime={new Date(event.timestamp! * 1000).toISOString()} title={local.slice(0, 10)}>
                     {local.slice(11, 16)}
                   </time>
