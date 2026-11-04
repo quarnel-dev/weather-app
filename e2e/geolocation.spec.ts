@@ -104,3 +104,28 @@ test('ignores a stalled location action after manual navigation', async ({ page,
     release()
   }
 })
+
+test('lets manual search bypass geolocation and ignores a late successful position', async ({ page, provider }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'geolocation', {
+      value: {
+        getCurrentPosition(success: PositionCallback) {
+          Reflect.set(window, 'finishManualGeolocation', () =>
+            success({ coords: { latitude: 31.30408, longitude: 120.59538 } } as GeolocationPosition)
+          )
+        },
+      },
+    })
+  })
+  await page.goto('/')
+  await page.getByRole('button', { name: 'Search manually' }).click()
+  const input = page.getByRole('combobox')
+  await expect(input).toBeVisible()
+  await page.evaluate(() => Reflect.get(window, 'finishManualGeolocation')())
+  await input.fill('Moscow')
+  await expect(page.getByRole('option').first()).toContainText('Moscow')
+  await expect(page).toHaveURL('/')
+  expect((await provider.state()).requests).toEqual([])
+  await input.press('Enter')
+  await expect(page).toHaveURL('/ru/moscow')
+})
