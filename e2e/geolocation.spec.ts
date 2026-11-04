@@ -2,15 +2,15 @@ import { test, expect } from './support/fixtures'
 import { denyGeolocation, rememberedCity } from './support/navigation'
 
 for (const city of [
-  { latitude: 31.30408, longitude: 120.59538, id: 1886760, name: 'Suzhou Jiangsu' },
-  { latitude: 33.63611, longitude: 116.97889, id: 1793743, name: 'Suzhou Anhui' },
+  { latitude: 31.30408, longitude: 120.59538, id: 1886760, name: 'Suzhou, CN · Jiangsu' },
+  { latitude: 33.63611, longitude: 116.97889, id: 1793743, name: 'Suzhou, CN · Anhui' },
 ]) {
   test(`resolves browser coordinates to the exact same-name record ${city.id}`, async ({ page, context, provider }) => {
     await context.grantPermissions(['geolocation'])
     await context.setGeolocation(city)
     await page.goto('/')
     await expect(page).toHaveURL(`/cn/suzhou-${city.id}`)
-    await expect(page.getByText(city.name, { exact: true })).toBeVisible()
+    await expect(page.getByRole('heading', { level: 1, name: city.name, exact: true })).toBeVisible()
     await rememberedCity(context, city.id)
     const requests = (await provider.state()).requests
     expect(requests.length).toBeGreaterThan(0)
@@ -28,7 +28,7 @@ test('falls back to manual search after permission denial', async ({ page, conte
   await expect(page.getByRole('listbox')).toBeVisible()
   await input.press('Enter')
   await expect(page).toHaveURL('/ru/moscow')
-  await expect(page.getByText('20°C', { exact: true })).toBeVisible()
+  await expect(page.getByRole('main').getByText('20°C', { exact: true })).toBeVisible()
   await rememberedCity(context, 524901)
 })
 
@@ -96,11 +96,47 @@ test('ignores a stalled location action after manual navigation', async ({ page,
     await expect(page.getByRole('listbox')).toBeVisible()
     await input.press('Enter')
     await expect(page).toHaveURL('/ru/moscow')
-    await expect(page.getByText('20°C', { exact: true })).toBeVisible()
+    await expect(page.getByRole('main').getByText('20°C', { exact: true })).toBeVisible()
     release()
     await rememberedCity(context, 524901)
     await expect(page).toHaveURL('/ru/moscow')
   } finally {
     release()
   }
+})
+
+test('lets manual search bypass geolocation and ignores a late successful position', async ({ page, provider }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'geolocation', {
+      value: {
+        getCurrentPosition(success: PositionCallback) {
+          Reflect.set(window, 'finishManualGeolocation', () =>
+            success({ coords: { latitude: 31.30408, longitude: 120.59538 } } as GeolocationPosition)
+          )
+        },
+      },
+    })
+  })
+  await page.goto('/')
+  await page.getByRole('button', { name: 'Search manually' }).click()
+  const input = page.getByRole('combobox')
+  await expect(input).toBeVisible()
+  await page.evaluate(() => Reflect.get(window, 'finishManualGeolocation')())
+  await input.fill('Moscow')
+  await expect(page.getByRole('option').first()).toContainText('Moscow')
+  await expect(page).toHaveURL('/')
+  expect((await provider.state()).requests).toEqual([])
+  await input.press('Enter')
+  await expect(page).toHaveURL('/ru/moscow')
+})
+
+test('respects reduced motion before the homepage client scripts load', async ({ page, provider }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  await page.route('**/_next/**/*.js', (route) => route.abort())
+  await page.goto('/')
+  await expect(page.getByRole('status')).toHaveText('Detecting your location...')
+  await expect(page.locator('main .i-spinner')).toHaveCSS('display', 'none')
+  await expect(page.locator('main .i-location')).toBeVisible()
+  await expect(page.getByRole('status').locator('..')).toHaveCSS('animation-name', 'none')
+  expect((await provider.state()).requests).toEqual([])
 })

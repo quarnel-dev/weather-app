@@ -1,0 +1,104 @@
+.container {
+  margin-top: 24px;
+  padding: 32px 24px;
+  border: 1px solid var(--weather-border-color);
+  border-radius: 24px;
+  background: var(--card);
+}
+
+.heading {
+  margin-bottom: 20px;
+  font-size: 18px;
+  font-weight: 400;
+}
+
+.list {
+  list-style: none;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 80px 24px minmax(0, 1fr) 40px 128px 40px;
+  align-items: center;
+  gap: 16px;
+  min-height: 76px;
+  padding: 16px 8px;
+  border-bottom: 1px solid var(--weather-border-color);
+  font-size: 14px;
+}
+
+.row:last-child {
+  border-bottom: 0;
+}
+
+.day {
+  color: var(--text-color);
+}
+
+.icon {
+  width: 24px;
+  height: 24px;
+  color: var(--weather-icon-color);
+}
+
+.description {
+  color: var(--muted-color);
+  text-transform: capitalize;
+  overflow-wrap: anywhere;
+}
+
+.minimum {
+  color: var(--muted-color);
+  text-align: right;
+}
+
+.maximum {
+  text-align: left;
+}
+
+.track {
+  position: relative;
+  height: 8px;
+  border-radius: 8px;
+  background: var(--weather-border-color);
+  overflow: hidden;
+}
+
+.range {
+  left: min(var(--range-start), calc(100% - 4px));
+  position: absolute;
+  height: 100%;
+  min-width: 4px;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--accent-blue), var(--accent-orange));
+}
+
+@media (max-width: 600px) {
+  .container {
+    padding: 24px 16px;
+  }
+  .row {
+    grid-template-columns: 44px 22px minmax(0, 1fr) 36px;
+    gap: 10px;
+    padding: 16px 0;
+  }
+  .icon {
+    width: 22px;
+    height: 22px;
+  }
+  .description {
+    grid-column: 3 / 5;
+  }
+  .minimum {
+    grid-column: 1;
+    grid-row: 2;
+  }
+  .track {
+    grid-column: 2 / 4;
+    grid-row: 2;
+  }
+  .maximum {
+    grid-column: 4;
+    grid-row: 2;
+  }
+}

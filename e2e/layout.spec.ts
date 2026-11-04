@@ -15,3 +15,31 @@ for (const { query, text } of [
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
   })
 }
+
+test('keeps keyboard-selected search results inside a short viewport', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 320 })
+  await page.addInitScript(() => Object.defineProperty(navigator, 'geolocation', { value: undefined }))
+  await page.goto('/')
+  const input = page.getByRole('combobox')
+  await input.fill('United States')
+  const options = page.getByRole('option')
+  await expect(options).toHaveCount(8)
+  for (let index = 0; index < 8; index++) await input.press('ArrowDown')
+  const last = options.last()
+  await expect(last).toBeInViewport({ ratio: 1 })
+  await expect(last).toHaveAttribute('aria-selected', 'true')
+  expect(await page.getByRole('listbox').evaluate((element) => element.scrollTop)).toBeGreaterThan(0)
+  for (let index = 0; index < 8; index++) await input.press('ArrowUp')
+  await expect(options.first()).toBeInViewport({ ratio: 1 })
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
+})
+
+test('wraps long ambiguous city names without overflowing a narrow page', async ({ page, provider }) => {
+  await page.setViewportSize({ width: 320, height: 900 })
+  await page.goto('/mx/solidaridad-fraccionamiento')
+  await expect(page.getByRole('heading', { name: 'Which Solidaridad [Fraccionamiento]?' })).toBeVisible()
+  await expect(page.getByRole('combobox')).toBeVisible()
+  await page.evaluate(() => document.fonts.ready)
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
+  expect((await provider.state()).requests).toEqual([])
+})

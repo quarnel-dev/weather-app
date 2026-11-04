@@ -14,6 +14,22 @@
 
   --accent-purple: #a855f7;
   --accent-purple-glow: rgba(168, 85, 247, 0.6);
+
+  --weather-gradient-blue: #193354;
+  --weather-gradient-navy: #091329;
+  --weather-gradient-purple: #301b46;
+  --weather-border-color: #1c2436;
+  --weather-icon-color: #9b9eb5;
+  --skeleton-color: #9b9eb54d;
+  --accent-blue: #49a3ff;
+  --accent-cyan: #00c9e8;
+  --accent-violet: #c379ff;
+  --accent-indigo: #8585ff;
+  --accent-orange: #ff9800;
+  --sunrise-start: #3c2110;
+  --sunrise-end: #352b10;
+  --sunset-start: #122545;
+  --sunset-end: #1b1c40;
 }
 
 html {
@@ -30,7 +46,7 @@ body {
 
   margin: auto;
 
-  height: 100dvh;
+  min-height: 100dvh;
   max-width: 1200px;
   width: 100%;
 
@@ -50,4 +66,10 @@ h1 {
   font-size: 2rem;
   font-weight: 700;
   text-align: center;
+}
+
+@media (max-width: 600px) {
+  body {
+    padding: 24px 16px;
+  }
 }

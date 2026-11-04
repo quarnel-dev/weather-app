@@ -19,6 +19,12 @@ const modes = new Set([
   'body',
   'unexpected',
   'missing-key',
+  'forecast-empty',
+  'missing-details',
+  'forecast-valid',
+  'forecast-http-503',
+  'forecast-headers',
+  'forecast-unexpected',
 ])
 const active = new Set()
 let settings = { mode: 'valid', delayMs: 0 }
@@ -87,7 +93,10 @@ globalThis.fetch = async function (input, options) {
   const url = new URL(typeof input === 'string' || input instanceof URL ? input : input.url)
   if (url.hostname !== 'api.openweathermap.org') return originalFetch(input, options)
 
-  const { mode, delayMs } = settings
+  const isForecast = url.pathname === '/data/2.5/forecast'
+  const forecastOnly = settings.mode.startsWith('forecast-')
+  const mode = forecastOnly ? (isForecast ? settings.mode.slice(9) : 'valid') : settings.mode
+  const delayMs = forecastOnly && !isForecast ? 0 : settings.delayMs
   const entry = {
     endpoint: url.pathname,
     lat: url.searchParams.get('lat'),
@@ -97,7 +106,9 @@ globalThis.fetch = async function (input, options) {
     completed: false,
   }
   requests.push(entry)
-  if (url.pathname !== '/data/2.5/weather') throw new Error('Unexpected provider endpoint in browser tests')
+  if (!['/data/2.5/weather', '/data/2.5/forecast'].includes(url.pathname)) {
+    throw new Error('Unexpected provider endpoint in browser tests')
+  }
 
   const controller = new AbortController()
   const abort = () => {
@@ -139,16 +150,50 @@ globalThis.fetch = async function (input, options) {
 
     const lat = Number(entry.lat)
     const name = lat > 50 ? 'Moscow' : lat > 32 ? 'Suzhou Anhui' : 'Suzhou Jiangsu'
-    const payload = {
+    const timezone = lat > 50 ? 10800 : 28800
+    const current = {
       cod: 200,
       name,
       sys: { country: lat > 50 ? 'RU' : 'CN', sunrise: 1761019200, sunset: 1761060000 },
-      main: { temp: mode === 'invalid' ? 'invalid' : 20, temp_min: 19, temp_max: 21, feels_like: 20, humidity: 50 },
+      main: {
+        temp: mode === 'invalid' ? 'invalid' : 20,
+        temp_min: 19,
+        temp_max: 21,
+        feels_like: 20,
+        humidity: 50,
+        pressure: 1013,
+      },
       weather: [{ description: 'clear sky', main: 'Clear', icon: '01d' }],
       wind: { speed: 2, deg: 90 },
       clouds: { all: 0 },
       coord: { lat, lon: Number(entry.lon) },
+      timezone,
+      visibility: 10000,
     }
+    if (mode === 'missing-details') {
+      current.timezone = null
+      current.main.pressure = null
+      current.visibility = null
+      current.sys.sunrise = null
+      current.sys.sunset = null
+    }
+    const first = Math.floor(Date.now() / 10800000) * 10800000 + 10800000
+    const payload = isForecast
+      ? {
+          cod: '200',
+          city: { timezone },
+          list: Array.from({ length: mode === 'empty' ? 0 : 40 }, (_, index) => {
+            const timestamp = first + index * 10800000
+            const hour = new Date(timestamp + timezone * 1000).getUTCHours()
+            return {
+              dt_txt: new Date(timestamp).toISOString().slice(0, 19).replace('T', ' '),
+              main: { ...current.main, temp: mode === 'invalid' ? 'invalid' : 21 + (index % 3) },
+              weather: [{ description: 'clear sky', main: 'Clear', icon: hour >= 6 && hour < 18 ? '01d' : '01n' }],
+              wind: current.wind,
+            }
+          }),
+        }
+      : current
     const response = Response.json(payload)
     if (mode === 'unexpected')
       Object.defineProperty(response, 'ok', {

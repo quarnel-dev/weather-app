@@ -13,8 +13,14 @@ type Mode =
   | 'body'
   | 'unexpected'
   | 'missing-key'
+  | 'forecast-empty'
+  | 'missing-details'
+  | 'forecast-valid'
+  | 'forecast-http-503'
+  | 'forecast-headers'
+  | 'forecast-unexpected'
 interface ProviderState {
-  requests: { endpoint: string; lat: string; lon: string; mode: Mode; aborted: boolean; completed: boolean }[]
+  requests: { endpoint: string; lat: string; lon: string; mode: Mode | 'empty'; aborted: boolean; completed: boolean }[]
 }
 interface Provider {
   mode: (mode: Mode, delayMs?: number) => Promise<void>
@@ -44,7 +50,11 @@ export const test = base.extend<{ provider: Provider; pageErrors: void }>({
       page.on('pageerror', (error) => errors.push(error.message))
       await provide()
       expect(errors).toEqual([])
-      expect((await provider.state()).requests.every((request) => request.endpoint === '/data/2.5/weather')).toBe(true)
+      expect(
+        (await provider.state()).requests.every((request) =>
+          ['/data/2.5/weather', '/data/2.5/forecast'].includes(request.endpoint)
+        )
+      ).toBe(true)
     },
     { auto: true },
   ],

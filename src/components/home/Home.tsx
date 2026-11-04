@@ -1,22 +1,20 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
-import { motion, AnimatePresence } from 'motion/react'
+import { useEffect, useRef, useState } from 'react'
 import { getGeoClient } from '@/services/geo/getGeo.service'
 import { resolveLocation } from '@/services/geo/resolveLocation.action'
 import Search from '@/components/search/Search'
 import s from '@/app/page.module.css'
+import styles from './Home.module.css'
+import loading from '@/components/weatherskeleton/WeatherSkeleton.module.css'
 
 type State = 'detecting' | 'search'
-
-const TRANSITION = { duration: 0.1 }
-const VISIBLE = { opacity: 1, filter: 'blur(0px)' }
-const HIDDEN = { opacity: 0, filter: 'blur(6px)' }
 
 export default function Home() {
   const router = useRouter()
   const [state, setState] = useState<State>('detecting')
+  const cancelDetection = useRef<() => void>(() => {})
 
   useEffect(() => {
     let active = true
@@ -28,6 +26,8 @@ export default function Home() {
       clearTimeout(timeout)
       setState('search')
     }
+
+    cancelDetection.current = showSearch
 
     async function detect() {
       try {
@@ -70,19 +70,26 @@ export default function Home() {
   }, [router])
 
   return (
-    <AnimatePresence mode="wait">
-      {state === 'detecting' && (
-        <motion.div key="loader" className={s.container} initial={HIDDEN} animate={VISIBLE} transition={TRANSITION}>
-          <i className={`i-spinner ${s.iLoader}`} />
-          <p role="status">Detecting your location...</p>
-        </motion.div>
-      )}
-
-      {state === 'search' && (
-        <motion.div key="search" className={s.container} initial={HIDDEN} animate={VISIBLE} transition={TRANSITION}>
+    <main className={s.container}>
+      {state === 'detecting' ? (
+        <div key="detecting" className={`${styles.detecting} ${loading.reveal}`}>
+          <span className={styles.badge} aria-hidden="true">
+            <i className={`i-spinner ${styles.spinner}`} />
+            <i className={`i-location ${styles.staticIcon}`} />
+          </span>
+          <p className={styles.status} role="status">
+            Detecting your location...
+          </p>
+          <p className={styles.hint}>Find nearby weather, or search for a city yourself.</p>
+          <button className={styles.action} type="button" onClick={() => cancelDetection.current()}>
+            Search manually
+          </button>
+        </div>
+      ) : (
+        <div key="search" className={`${styles.search} ${loading.reveal}`}>
           <Search />
-        </motion.div>
+        </div>
       )}
-    </AnimatePresence>
+    </main>
   )
 }

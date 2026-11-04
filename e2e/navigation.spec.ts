@@ -17,7 +17,7 @@ test('keeps same-name city links distinct and restores the selected record befor
   await input.press('ArrowDown')
   await input.press('Enter')
   await expect(page).toHaveURL('/cn/suzhou-1793743')
-  await expect(page.getByText('Suzhou Anhui', { exact: true })).toBeVisible()
+  await expect(page.getByRole('heading', { level: 1, name: 'Suzhou, CN · Anhui', exact: true })).toBeVisible()
   await rememberedCity(context, 1793743)
   await page.goto('/')
   await expect(page).toHaveURL('/cn/suzhou-1793743')
@@ -38,7 +38,7 @@ test('can search again after selecting the current city and navigate with mouse 
   if (info.project.name === 'mobile-chromium') await link.tap()
   else await link.click()
   await expect(page).toHaveURL('/cn/suzhou-1886760')
-  await expect(page.getByText('Suzhou Jiangsu', { exact: true })).toBeVisible()
+  await expect(page.getByRole('heading', { level: 1, name: 'Suzhou, CN · Jiangsu', exact: true })).toBeVisible()
   await rememberedCity(context, 1886760)
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
 })
@@ -96,7 +96,7 @@ test('ignores old weather content after switching cities during a slow request',
   await input.press('ArrowDown')
   await input.press('Enter')
   await expect(page).toHaveURL('/cn/suzhou-1793743')
-  await expect(page.getByText('Suzhou Anhui', { exact: true })).toBeVisible()
+  await expect(page.getByRole('heading', { level: 1, name: 'Suzhou, CN · Anhui', exact: true })).toBeVisible()
   await expect
     .poll(async () =>
       (await provider.state()).requests.filter((request) => request.lat === '55.7520400').every((request) => request.completed)
@@ -104,7 +104,7 @@ test('ignores old weather content after switching cities during a slow request',
     .toBe(true)
   await rememberedCity(context, 1793743)
   await expect(page).toHaveURL('/cn/suzhou-1793743')
-  await expect(page.getByText('Moscow', { exact: true })).toHaveCount(0)
+  await expect(page.getByRole('main').getByText('Moscow', { exact: true })).toHaveCount(0)
 })
 
 test('keeps browser back and forward navigation aligned with the remembered city', async ({ page, context }) => {
@@ -118,10 +118,10 @@ test('keeps browser back and forward navigation aligned with the remembered city
   await rememberedCity(context, 1886760)
   await page.goBack()
   await expect(page).toHaveURL('/ru/moscow')
-  await expect(page.getByText('Moscow', { exact: true })).toBeVisible()
+  await expect(page.getByRole('main').getByText('Moscow', { exact: true })).toBeVisible()
   await rememberedCity(context, 524901)
   await page.goForward()
   await expect(page).toHaveURL('/cn/suzhou-1886760')
-  await expect(page.getByText('Suzhou Jiangsu', { exact: true })).toBeVisible()
+  await expect(page.getByRole('heading', { level: 1, name: 'Suzhou, CN · Jiangsu', exact: true })).toBeVisible()
   await rememberedCity(context, 1886760)
 })

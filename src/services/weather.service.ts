@@ -9,13 +9,13 @@ import { parseWeather, parseForecast } from './weather/payload.server'
 
 const loadWeather = unstable_cache(
   async (lat: string, lon: string) => parseWeather(await requestWeather('weather', { lat, lon })),
-  ['weather-current-v1'],
+  ['weather-current-v2'],
   { revalidate: 600 }
 )
 
 const loadForecast = unstable_cache(
   async (lat: string, lon: string) => parseForecast(await requestWeather('forecast', { lat, lon })),
-  ['weather-forecast-v1'],
+  ['weather-forecast-v2'],
   { revalidate: 600 }
 )
 
