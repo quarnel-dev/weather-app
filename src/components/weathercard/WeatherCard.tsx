@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import type { Weather } from '@/types/Weather.type'
 import type { City } from '@/types/City.type'
 import s from './WeatherCard.module.css'
@@ -5,9 +6,10 @@ import s from './WeatherCard.module.css'
 interface Props {
   weather: Weather
   city: Pick<City, 'name' | 'country' | 'admin1'>
+  children: ReactNode
 }
 
-export function WeatherCard({ weather, city }: Props) {
+export function WeatherCard({ weather, city, children }: Props) {
   return (
     <section className={s.card} aria-label="Current weather">
       <div className={s.location}>
@@ -26,6 +28,9 @@ export function WeatherCard({ weather, city }: Props) {
         <p className={s.description}>{weather.description}</p>
         <p className={s.feelsLike}>Feels like {weather.feelsLike}°</p>
       </div>
+      <section className={s.forecast} aria-label="Three-hour forecast">
+        {children}
+      </section>
     </section>
   )
 }

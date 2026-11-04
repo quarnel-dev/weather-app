@@ -125,19 +125,24 @@ test('reuses validated weather after the provider becomes unavailable', async ({
   await expect
     .poll(async () => (await page.context().cookies()).find((cookie) => cookie.name === 'lastCity')?.value)
     .toBe('524901')
+  await expect(page.getByRole('region', { name: 'Three-hour forecast' }).getByRole('list')).toBeVisible()
   const initial = (await provider.state()).requests.length
   await provider.mode('http-503')
   await page.reload()
   await expect(page.getByRole('main').getByText('20°C', { exact: true })).toBeVisible()
+  await expect(page.getByRole('region', { name: 'Three-hour forecast' }).getByRole('list')).toBeVisible()
   expect((await provider.state()).requests).toHaveLength(initial)
 })
 
-test('shares one provider request between simultaneous cold page requests', async ({ request, provider }) => {
+test('shares one request per endpoint between simultaneous cold page requests', async ({ request, provider }) => {
   await provider.mode('valid', 750)
   const responses = await Promise.all([request.get('/ru/moscow'), request.get('/ru/moscow')])
   for (const response of responses) {
     expect(response.status()).toBe(200)
     expect(await response.text()).toContain('clear sky')
   }
-  expect((await provider.state()).requests).toHaveLength(1)
+  expect((await provider.state()).requests.map((request) => request.endpoint).sort()).toEqual([
+    '/data/2.5/forecast',
+    '/data/2.5/weather',
+  ])
 })

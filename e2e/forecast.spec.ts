@@ -1,0 +1,65 @@
+import { test, expect } from './support/fixtures'
+
+test('streams current weather before forecast and keeps search usable during loading', async ({ page, provider }, info) => {
+  await provider.mode('forecast-valid', 3000)
+  await page.goto('/ru/moscow', { waitUntil: 'commit' })
+  await expect(page.getByRole('main').getByText('20°C', { exact: true })).toBeVisible()
+  const forecast = page.getByRole('region', { name: 'Three-hour forecast' })
+  await expect(forecast.getByRole('status')).toHaveText('Loading forecast...')
+  const input = page.getByRole('combobox')
+  await input.fill('Suzhou')
+  await expect(page.getByRole('option')).toHaveCount(2)
+  await input.press('Escape')
+  const list = forecast.getByRole('list')
+  await expect(list.getByRole('listitem')).toHaveCount(8)
+  await expect(list.getByText('Now', { exact: true })).toBeVisible()
+  const timestamps = await list
+    .locator('time')
+    .evaluateAll((times) => times.map((time) => Date.parse(time.getAttribute('datetime') ?? '')))
+  expect(timestamps).toHaveLength(7)
+  expect(timestamps.slice(1).every((time, index) => time - timestamps[index] === 10800000)).toBe(true)
+  if (info.project.name === 'mobile-chromium') {
+    expect(await list.evaluate((element) => element.scrollWidth > element.clientWidth)).toBe(true)
+    await list.focus()
+    await list.press('ArrowRight')
+    await expect.poll(() => list.evaluate((element) => element.scrollLeft)).toBeGreaterThan(0)
+  }
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
+})
+
+test('retries a failed forecast while preserving current weather and search input', async ({ page, provider }) => {
+  await provider.mode('forecast-http-503')
+  await page.goto('/ru/moscow')
+  const forecast = page.getByRole('region', { name: 'Three-hour forecast' })
+  await expect(forecast.getByRole('alert')).toHaveText('Forecast is temporarily unavailable.')
+  await expect(page.getByRole('main').getByText('20°C', { exact: true })).toBeVisible()
+  const input = page.getByRole('combobox')
+  await input.fill('Suzhou')
+  await expect(page.getByRole('option')).toHaveCount(2)
+  await input.press('Tab')
+  const retry = forecast.getByRole('button', { name: 'Try again' })
+  await expect(retry).toBeFocused()
+  await provider.mode('valid', 500)
+  await retry.click()
+  await expect(forecast.getByRole('listitem')).toHaveCount(8)
+  await expect(input).toHaveValue('Suzhou')
+  await expect(page.getByRole('main').getByText('20°C', { exact: true })).toBeVisible()
+  expect((await provider.state()).requests.filter((request) => request.endpoint === '/data/2.5/weather')).toHaveLength(1)
+})
+
+test('contains unexpected forecast errors inside the timeline and recovers', async ({ page, provider }) => {
+  await provider.mode('forecast-unexpected')
+  await page.goto('/ru/moscow')
+  const forecast = page.getByRole('region', { name: 'Three-hour forecast' })
+  await expect(forecast.getByRole('alert')).toHaveText('Forecast could not be displayed. Try again.')
+  await expect(page.getByRole('heading', { level: 1, name: 'Moscow, RU', exact: true })).toBeVisible()
+  await expect(page.getByRole('main').getByText('20°C', { exact: true })).toBeVisible()
+  await expect(page.getByRole('main')).not.toContainText('Private unexpected failure')
+  await page.evaluate(() => {
+    document.documentElement.dataset.forecastSession = 'preserved'
+  })
+  await provider.mode('valid')
+  await forecast.getByRole('button', { name: 'Try again' }).click()
+  await expect(forecast.getByRole('listitem')).toHaveCount(8)
+  expect(await page.evaluate(() => document.documentElement.dataset.forecastSession)).toBe('preserved')
+})

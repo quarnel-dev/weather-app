@@ -1,6 +1,9 @@
 import 'server-only'
 
+import { Suspense } from 'react'
 import { WeatherCard } from './WeatherCard'
+import WeatherBoundary from './WeatherBoundary'
+import { ForecastTimelineServer } from '@/components/forecasttimeline/ForecastTimeline.server'
 
 import { getWeather } from '@/services/weather.service'
 import type { City } from '@/types/City.type'
@@ -18,5 +21,13 @@ export async function WeatherCardServer({ city }: { city: City }) {
     console.error('Weather request failed', { code: error.code, status: error.status })
     return <Recovery {...weatherFailure(error)} />
   }
-  return <WeatherCard weather={data} city={city} />
+  return (
+    <WeatherCard weather={data} city={city}>
+      <WeatherBoundary message="Forecast could not be displayed. Try again.">
+        <Suspense fallback={<p role="status">Loading forecast...</p>}>
+          <ForecastTimelineServer city={city} weather={data} />
+        </Suspense>
+      </WeatherBoundary>
+    </WeatherCard>
+  )
 }

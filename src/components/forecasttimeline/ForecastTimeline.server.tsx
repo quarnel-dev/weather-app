@@ -1,0 +1,31 @@
+import 'server-only'
+
+import { getForecast } from '@/services/weather.service'
+import { WeatherServiceError } from '@/services/weather/weatherError'
+import { weatherFailure } from '@/services/weather/failure.server'
+import Recovery from '@/components/recovery/Recovery'
+import type { City } from '@/types/City.type'
+import type { Weather } from '@/types/Weather.type'
+import type { Forecast } from '@/types/Forecast.type'
+import { ForecastTimeline } from './ForecastTimeline'
+
+async function readForecast(city: City) {
+  const forecast = await getForecast(city)
+  return { forecast, now: Date.now() }
+}
+
+export async function ForecastTimelineServer({ city, weather }: { city: City; weather: Weather }) {
+  const timezoneOffset = weather.timezoneOffset
+  if (timezoneOffset === null) return <p>Forecast times are unavailable for this location.</p>
+
+  let data: { forecast: Forecast[]; now: number }
+  try {
+    data = await readForecast(city)
+  } catch (error) {
+    if (!(error instanceof WeatherServiceError)) throw error
+    console.error('Forecast request failed', { code: error.code, status: error.status })
+    return <Recovery message="Forecast is temporarily unavailable." retryable={weatherFailure(error).retryable} />
+  }
+
+  return <ForecastTimeline forecast={data.forecast} weather={weather} timezoneOffset={timezoneOffset} now={data.now} />
+}
