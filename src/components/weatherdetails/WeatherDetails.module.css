@@ -1,0 +1,102 @@
+.details {
+  margin-top: 24px;
+  flex-shrink: 0;
+}
+
+.metrics,
+.solar {
+  display: grid;
+  gap: 16px;
+}
+
+.metrics {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.solar {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 24px;
+}
+
+.card {
+  padding: 24px;
+  border: 1px solid var(--weather-border-color);
+  border-radius: 16px;
+  background: var(--card);
+}
+
+.label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--metric-accent);
+}
+
+.label i {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+}
+
+.value {
+  font-size: 36px;
+  font-weight: 300;
+  line-height: 1.2;
+  letter-spacing: -0.04em;
+}
+
+.unit {
+  margin-top: 8px;
+  color: var(--muted-color);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.blue {
+  --metric-accent: var(--accent-blue);
+}
+.cyan {
+  --metric-accent: var(--accent-cyan);
+}
+.violet {
+  --metric-accent: var(--accent-violet);
+}
+.indigo {
+  --metric-accent: var(--accent-indigo);
+}
+
+.sunrise {
+  --metric-accent: var(--accent-orange);
+  background: linear-gradient(110deg, var(--sunrise-start), var(--sunrise-end));
+}
+
+.sunset {
+  --metric-accent: var(--accent-blue);
+  background: linear-gradient(110deg, var(--sunset-start), var(--sunset-end));
+}
+
+@media (max-width: 800px) {
+  .metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .solar {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .card {
+    padding: 20px;
+  }
+  .label {
+    gap: 8px;
+    font-size: 13px;
+  }
+  .value {
+    font-size: 32px;
+  }
+}

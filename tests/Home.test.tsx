@@ -1,4 +1,3 @@
-import type { ReactNode } from 'react'
 import { StrictMode } from 'react'
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, expect, test, vi } from 'vitest'
@@ -14,10 +13,6 @@ vi.mock('next/navigation', () => ({ useRouter: () => router }))
 vi.mock('@/services/geo/getGeo.service', () => ({ getGeoClient }))
 vi.mock('@/services/geo/resolveLocation.action', () => ({ resolveLocation }))
 vi.mock('@/components/search/Search', () => ({ default: () => <input aria-label="Search cities" /> }))
-vi.mock('motion/react', () => ({
-  AnimatePresence: ({ children }: { children: ReactNode }) => <>{children}</>,
-  motion: { div: ({ children }: { children: ReactNode }) => <div>{children}</div> },
-}))
 
 function deferred<T>() {
   let resolve!: (value: T) => void
@@ -173,4 +168,23 @@ test('ignores the discarded effect during a React Strict Mode restart', async ()
   })
   expect(screen.getByLabelText('Search cities')).toBeTruthy()
   expect(resolveLocation).not.toHaveBeenCalled()
+})
+
+test.each(['browser', 'server'])('lets manual search cancel a pending %s location lookup', async (source) => {
+  const geo = deferred<{ lat: number; lon: number }>()
+  const location = deferred<string | null>()
+  getGeoClient.mockReturnValue(source === 'browser' ? geo.promise : Promise.resolve({ lat: 51, lon: 0 }))
+  resolveLocation.mockReturnValue(location.promise)
+  await act(async () => {
+    render(<Home />)
+  })
+  fireEvent.click(screen.getByRole('button', { name: 'Search manually' }))
+  expect(screen.getByLabelText('Search cities')).toBeTruthy()
+  expect(vi.getTimerCount()).toBe(0)
+  await act(async () => {
+    geo.resolve({ lat: 51, lon: 0 })
+    location.resolve('/gb/london')
+  })
+  expect(router.replace).not.toHaveBeenCalled()
+  if (source === 'browser') expect(resolveLocation).not.toHaveBeenCalled()
 })

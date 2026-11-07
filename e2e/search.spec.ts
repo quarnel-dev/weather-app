@@ -1,17 +1,26 @@
 import { test, expect } from './support/fixtures'
 
-test('recovers search after a failed API request without losing the query', async ({ page }) => {
+test('recovers search after a failed API request without losing the query', async ({ page }, info) => {
   await page.route('**/api/cities?**', (route) => route.fulfill({ status: 503, json: { error: 'Unavailable' } }))
   await page.goto('/cn/suzhou')
   const input = page.getByRole('combobox')
   await input.fill('Moscow')
-  await expect(page.getByRole('main').getByRole('alert')).toHaveText(
-    'Search is unavailable. Try again by editing your query or refocusing the field.'
-  )
+  await expect(page.getByRole('main').getByRole('alert')).toHaveText('Search is temporarily unavailable.')
   await expect(page.getByRole('listbox')).toHaveCount(0)
-  await page.unroute('**/api/cities?**')
   await input.press('Tab')
+  const retry = page.getByRole('button', { name: 'Try again' })
+  await expect(retry).toBeFocused()
+  await retry.press('Escape')
+  await expect(page.getByRole('main').getByRole('alert')).toHaveCount(0)
+  await expect(retry).toHaveCount(0)
   await input.focus()
+  await expect(page.getByRole('main').getByRole('alert')).toBeVisible()
+  await input.press('Tab')
+  await expect(retry).toBeFocused()
+  await page.unroute('**/api/cities?**')
+  if (info.project.name === 'mobile-chromium') await retry.tap()
+  else await retry.press('Enter')
+  await expect(input).toBeFocused()
   await expect(input).toHaveValue('Moscow')
   await expect(page.getByRole('option').first()).toContainText('Moscow')
   await input.press('Enter')
@@ -73,6 +82,9 @@ test('announces an empty result and closes subsequent suggestions with Escape', 
   const input = page.getByRole('combobox')
   await input.fill('zzzzzzzzzzzzzzzz')
   await expect(page.getByRole('status')).toHaveText('No cities found.')
+  await expect(page.getByText('Try another city or country.')).toBeVisible()
+  await input.press('Escape')
+  await expect(page.getByRole('status')).toHaveCount(0)
   await input.fill('Suzhou')
   await expect(page.getByRole('option')).toHaveCount(2)
   await input.press('Escape')

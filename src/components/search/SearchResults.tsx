@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { useEffect, useRef } from 'react'
 import { motion, useIsPresent } from 'motion/react'
 import type { CitySearchResult } from '@/types/CitySearchResult.type'
 import { dropdownVariants, itemVariants } from './Search.variants'
@@ -15,9 +16,21 @@ interface Props {
 
 export default function SearchResults({ results, listId, activeIndex, onSelect }: Props) {
   const isPresent = useIsPresent()
+  const listRef = useRef<HTMLUListElement>(null)
+
+  useEffect(() => {
+    const list = listRef.current
+    const option = list?.children.item(activeIndex)
+    if (!list || !(option instanceof HTMLElement)) return
+    const top = option.offsetTop
+    const bottom = top + option.offsetHeight
+    if (top < list.scrollTop) list.scrollTop = top
+    else if (bottom > list.scrollTop + list.clientHeight) list.scrollTop = bottom - list.clientHeight
+  }, [activeIndex])
 
   return (
     <motion.ul
+      ref={listRef}
       id={listId}
       className={s.dropdown}
       role="listbox"

@@ -16,6 +16,7 @@ export function useSearch() {
   const [status, setStatus] = useState<SearchStatus>('idle')
   const [activeIndex, setActiveIndex] = useState(-1)
   const [isFocused, setIsFocused] = useState(false)
+  const [retryAttempt, setRetryAttempt] = useState(0)
   const inputRef = useRef<HTMLInputElement>(null)
   const requestRef = useRef<AbortController | null>(null)
   const listId = useId()
@@ -54,7 +55,7 @@ export function useSearch() {
       clearTimeout(requestTimeout)
       controller.abort()
     }
-  }, [query, isFocused])
+  }, [query, isFocused, retryAttempt])
 
   function resetSearch(value: string) {
     requestRef.current?.abort()
@@ -79,8 +80,16 @@ export function useSearch() {
   }
 
   function handleFocus() {
+    if (isFocused) return
     resetSearch(query)
     setIsFocused(true)
+  }
+
+  function retrySearch() {
+    if (!isFocused || status !== 'error') return
+    resetSearch(query)
+    setRetryAttempt((attempt) => attempt + 1)
+    inputRef.current?.focus()
   }
 
   function handleSelect() {
@@ -94,6 +103,7 @@ export function useSearch() {
     if (e.key === 'Escape') {
       e.preventDefault()
       handleSelect()
+      if (e.target instanceof HTMLElement) e.target.blur()
       return
     }
     if (!open) return
@@ -117,7 +127,7 @@ export function useSearch() {
   if (isFocused) {
     if (normalize(query).length > MAX_SEARCH_LENGTH) message = `Use up to ${MAX_SEARCH_LENGTH} characters.`
     else if (status === 'loading') message = 'Searching...'
-    else if (status === 'error') message = 'Search is unavailable. Try again by editing your query or refocusing the field.'
+    else if (status === 'error') message = 'Search is temporarily unavailable.'
     else if (status === 'success' && results.length === 0) message = 'No cities found.'
   }
 
@@ -136,5 +146,6 @@ export function useSearch() {
     handleKeyDown,
     handleBlur,
     handleSelect,
+    retrySearch,
   }
 }

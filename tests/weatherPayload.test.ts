@@ -24,6 +24,9 @@ describe('current weather payload', () => {
       main: 'Clear',
       icon: 'clearDay',
       humidity: 50,
+      pressure: 1013,
+      visibility: 10000,
+      timezoneOffset: 28800,
       windSpeed: 2.5,
       windDeg: 90,
       clouds: 0,
@@ -50,6 +53,14 @@ describe('current weather payload', () => {
     ['main.humidity', 101],
     ['main.humidity', -1],
     ['main.humidity', '50'],
+    ['main.pressure', -1],
+    ['main.pressure', '1013'],
+    ['visibility', -1],
+    ['visibility', Infinity],
+    ['timezone', -43201],
+    ['timezone', 50401],
+    ['timezone', 0.5],
+    ['timezone', '28800'],
     ['weather', []],
     ['weather.0', null],
     ['weather.0.description', 2],
@@ -89,6 +100,25 @@ describe('current weather payload', () => {
     expect(parseWeather(data)).toMatchObject({ temp: 0, humidity: 0, windSpeed: 0, windDeg: 0, clouds: 0 })
   })
 
+  test.each([undefined, null])('keeps unavailable page metrics absent: %s', (value) => {
+    const data = weatherPayload()
+    change(data, 'main.pressure', value)
+    change(data, 'visibility', value)
+    change(data, 'timezone', value)
+    expect(parseWeather(data)).toMatchObject({ temp: 20, pressure: null, visibility: null, timezoneOffset: null })
+  })
+
+  test('preserves zero visibility and UTC instead of treating them as missing', () => {
+    const data = weatherPayload()
+    change(data, 'visibility', 0)
+    change(data, 'timezone', 0)
+    expect(parseWeather(data)).toMatchObject({ visibility: 0, timezoneOffset: 0 })
+  })
+
+  test.each([-43200, -12600, 20700, 50400])('preserves signed and fractional-hour UTC offsets: %s', (offset) => {
+    expect(parseWeather(change(weatherPayload(), 'timezone', offset)).timezoneOffset).toBe(offset)
+  })
+
   test.each([
     ['01d', 'clearDay'],
     ['01n', 'clearNight'],
@@ -113,10 +143,20 @@ describe('current weather payload', () => {
 })
 
 describe('forecast payload', () => {
-  test('returns the existing noon UTC samples in provider order', () => {
+  test('preserves every forecast point in provider order with explicit UTC dates', () => {
     expect(parseForecast(forecastPayload())).toEqual([
       {
-        date: '2026-10-21 12:00:00',
+        date: '2026-10-21T09:00:00Z',
+        temp: 18,
+        tempMin: 17,
+        tempMax: 19,
+        description: 'light rain',
+        icon: 'rain',
+        humidity: 60,
+        windSpeed: 3,
+      },
+      {
+        date: '2026-10-21T12:00:00Z',
         temp: 20,
         tempMin: 19,
         tempMax: 21,
@@ -126,7 +166,7 @@ describe('forecast payload', () => {
         windSpeed: 3,
       },
       {
-        date: '2026-10-22 12:00:00',
+        date: '2026-10-22T12:00:00Z',
         temp: 20,
         tempMin: 19,
         tempMax: 21,
@@ -165,7 +205,7 @@ describe('forecast payload', () => {
     ['list.1.weather', []],
     ['list.1.weather.0.icon', {}],
     ['list.0.main.temp', null],
-  ])('validates all forecast entries, including unselected hours: %s', (path, value) => {
+  ])('validates every forecast entry: %s', (path, value) => {
     expect(() => parseForecast(change(forecastPayload(), path, value))).toThrow(WeatherServiceError)
   })
 })

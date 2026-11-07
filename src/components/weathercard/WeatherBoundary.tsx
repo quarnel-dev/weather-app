@@ -5,6 +5,8 @@ import Recovery from '@/components/recovery/Recovery'
 
 interface Props {
   children: ReactNode
+  message?: string
+  compact?: boolean
 }
 
 export default class WeatherBoundary extends Component<Props, { failed: boolean }> {
@@ -19,7 +21,14 @@ export default class WeatherBoundary extends Component<Props, { failed: boolean 
   }
 
   render() {
-    if (this.state.failed) return <Recovery message="Weather could not be displayed. Try again or search for another city." />
+    if (this.state.failed) {
+      return (
+        <Recovery
+          compact={this.props.compact}
+          message={this.props.message ?? 'Weather could not be displayed. Try again or search for another city.'}
+        />
+      )
+    }
     return this.props.children
   }
 }

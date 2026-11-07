@@ -2,14 +2,16 @@
 
 import { useTransition } from 'react'
 import { useRouter } from 'next/navigation'
+import s from './Recovery.module.css'
 
 interface Props {
   message: string
   retryable?: boolean
   onRetry?: () => void
+  compact?: boolean
 }
 
-export default function Recovery({ message, retryable = true, onRetry }: Props) {
+export default function Recovery({ message, retryable = true, onRetry, compact = false }: Props) {
   const router = useRouter()
   const [pending, startTransition] = useTransition()
 
@@ -22,14 +24,21 @@ export default function Recovery({ message, retryable = true, onRetry }: Props) 
   }
 
   return (
-    <div>
-      <p role="alert">{message}</p>
+    <div className={`${s.panel} ${compact ? s.compact : ''}`}>
+      <i className={`i-weather-unknown ${s.icon}`} aria-hidden="true" />
+      <p className={s.message} role="alert">
+        {message}
+      </p>
       {retryable && (
-        <button type="button" disabled={pending} onClick={retry}>
+        <button className={s.retry} type="button" disabled={pending} onClick={retry}>
           {pending ? 'Retrying...' : 'Try again'}
         </button>
       )}
-      {pending && <p role="status">Trying again...</p>}
+      {pending && (
+        <p className={s.pending} role="status">
+          Trying again...
+        </p>
+      )}
     </div>
   )
 }

@@ -10,6 +10,7 @@ import searchStyles from '@/components/search/Search.module.css'
 
 import Search from '@/components/search/Search'
 import { WeatherCardServer } from '@/components/weathercard/WeatherCard.server'
+import { WeatherSkeleton } from '@/components/weatherskeleton/WeatherSkeleton'
 import RememberCity from '@/components/remembercity/RememberCity'
 import WeatherBoundary from '@/components/weathercard/WeatherBoundary'
 
@@ -60,7 +61,7 @@ export default async function Page({ params }: Props) {
       <RememberCity id={found.id} />
       <Search />
       <WeatherBoundary key={found.id}>
-        <Suspense fallback={<p role="status">Loading weather...</p>}>
+        <Suspense fallback={<WeatherSkeleton city={found} />}>
           <WeatherCardServer city={found} />
         </Suspense>
       </WeatherBoundary>
