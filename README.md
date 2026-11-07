@@ -35,10 +35,10 @@ Open http://localhost:3000.
 
 ## Environment
 
-| Variable | Required | Description |
-| :------- | :------- | :---------- |
-| `WEATHER_API_KEY` | Yes | API key from [OpenWeather](https://openweathermap.org/). |
-| `ALLOWED_ORIGINS` | No | Extra development hosts allowed by Next.js, comma-separated. |
+| Variable          | Required | Description                                                  |
+| :---------------- | :------- | :----------------------------------------------------------- |
+| `WEATHER_API_KEY` | Yes      | API key from [OpenWeather](https://openweathermap.org/).     |
+| `ALLOWED_ORIGINS` | No       | Extra development hosts allowed by Next.js, comma-separated. |
 
 ## Commands
 
@@ -59,4 +59,4 @@ npm run build:e2e
 npm run test:e2e
 ```
 
-*Made with ❤️ by Quarnel*
+_Made with ❤️ by Quarnel_
